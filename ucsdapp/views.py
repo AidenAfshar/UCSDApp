@@ -17,7 +17,7 @@ publisher = pubsub_v1.PublisherClient()
 storage_client = storage.Client()
 
 project_id = "tranquil-sunup-376804"
-credential_path = "C:\\Users\\aiden\\Downloads\\UCSDApp2\\UCSDApprev2\\UCSDApp2\\tranquil-sunup-376804-1a86726987a6.json"
+credential_path = "/Users/aidenafshar/Documents/UCSDApp/UCSDApp/tranquil-sunup-376804-1a86726987a6.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
 
@@ -28,6 +28,7 @@ def detect_text_local(path):
     client = vision.ImageAnnotatorClient()
 
     """
+    For using file instead of image from camera (left for testing only)
     with io.open(path, 'rb') as image_file:
         content = image_file.read()
     """
@@ -38,58 +39,32 @@ def detect_text_local(path):
     response = client.text_detection(image=image)
     texts = response.text_annotations
     print('Texts:')
-
-    textAndCoords = []
+    textAndCoords = {}
 
     for text in texts:
-        print('\n"{}"'.format(text.description))
+       # print('\n"{}"'.format(text.description))
 
         vertices = (['({},{})'.format(vertex.x, vertex.y)
                     for vertex in text.bounding_poly.vertices])
 
-        print('bounds: {}'.format(','.join(vertices)))
+        # print('bounds: {}'.format(','.join(vertices)))
 
-        textAndCoords += [text, vertices]
+        textAndCoords[text.description] = vertices
 
     if response.error.message:
         raise Exception(
             '{}\nFor more info on error messages, check: '
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
+
+    textAndCoords = json.dumps(textAndCoords)
+    
     return textAndCoords
-
-def detect_text_uri(uri):
-    """Detects text in the file located in Google Cloud Storage or on the Web.
-    """
-    from google.cloud import vision
-    client = vision.ImageAnnotatorClient()
-    image = vision.Image()
-    image.source.image_uri = uri
-
-    response = client.text_detection(image=image)
-    texts = response.text_annotations
-    print('Texts:')
-
-    for text in texts:
-        print('\n"{}"'.format(text.description))
-
-        vertices = (['({},{})'.format(vertex.x, vertex.y)
-                    for vertex in text.bounding_poly.vertices])
-
-        print('bounds: {}'.format(','.join(vertices)))
-
-    if response.error.message:
-        raise Exception(
-            '{}\nFor more info on error messages, check: '
-            'https://cloud.google.com/apis/design/errors'.format(
-                response.error.message))
-    return texts
 
 def index(request):
     return render(request, 'ucsdapp/index.html')
 
-
 def myajaxtestview(request):
     filename = request.POST['text'] 
-    texts = detect_text_local(filename)
-    return HttpResponse("dont")
+    textAndCoords = detect_text_local(filename)
+    return HttpResponse(textAndCoords)

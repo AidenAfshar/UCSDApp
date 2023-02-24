@@ -13,8 +13,11 @@
   <p>
 
         Screenshots : <p>
-      <canvas  id="myCanvas" width="400" height="350"></canvas>  
+      <canvas  id="myCanvas" width="400" height="350"></canvas>
+   </p>
+   <p id = "photoText"></p>
   </body>
+  
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script>
 
@@ -57,48 +60,10 @@
            console.log("getUserMedia not supported");
         }  
       }
-      /*
-      function send_data() {
-        $.ajax({
-            url : 'the_url',
-            data : {
-               'csrfmiddlewaretoken' : '<the-token>',
-               'key1' : 'val1',
-            },
-            method : 'POST',
-            success : success_function // reference to below
-         });
       
- // ---------/c\zw-98310--/--\---------
-    // TAKE A SNAPSHOT CODE
-      //-----------------=----
-      // trigger send_data on some event:
-      $('<the-selector').on('<some-event>', {}, send_data);
-
-      // i.e. send data on button click:
-      $('#button-id').on('click', {}, send_data);
-
-      // success function:
-      function success_function(response) {
-
-      // unpack response:
-      val2 = response.key2;
-
-      // do some logic:
-      ...
-
-      }
-      }
-      */
-
-      // ----------------------
-      // TAKE A SNAPSHOT CODE
-      //-----------------=----
       var canvas, ctx;
 
       function init() {
-        // Get the canvas and obtain a context for
-        // drawing in it
         canvas = document.getElementById("myCanvas");
         ctx = canvas.getContext('2d');
 
@@ -116,8 +81,6 @@
 
      function snapshot () {
          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-         //screenshotImage.src = canvas.toDataURL('image/webp');
-         //screenshotImage.classList.remove('d-none');
          var text = canvas.toDataURL('image/png', 1.0);
          
          text = text.slice(22);
@@ -127,96 +90,64 @@
             url: "{{ 'my-ajax-test/' }}",
             data: { csrfmiddlewaretoken: '{{ csrf_token }}', text: text },
             success: function callback(response){
-                        console.log(response);
-                        ctx.beginPath();
-                        ctx.rect(20, 20, 150, 100);
-                        ctx.strokeStyle = "blue"
-                        ctx.stroke();
-                        var imagePaper = new Image();
-                        imagePaper.onload = function(){
-                           context.drawImage(imagePaper, 100, 20, 500,500);
-                           onload(canvas, context);
-                        };
-                        imagePaper.src = "images/main_timerand3papers.png";
+               response = JSON.parse(response);
+               var originalCoords;
+               var prevCoords;
+               var fullText = String(Object.keys(response)).split("\n");
+               for (var i = 0; i < (fullText.length); i++) {
+                  var wordList = fullText[i].split(" ");
+                  ctx.beginPath();
+                  if (wordList.length == 1) {
+                     for (let j = 0; j < 4; j++) {
+                        response[wordList][j] = response[wordList][j].replace('(', '');
+                        response[wordList][j] = response[wordList][j].replace(')', '');
+                        coords = response[wordList][j].split(',');
+                        if (j == 0) {
+                           ctx.moveTo(parseInt(coords[0]), parseInt(coords[1]));
+                           originalCoords = coords;
+                        }
+                        else {
+                           ctx.lineTo(parseInt(coords[0]), parseInt(coords[1]));
+                        }
                      }
+                     ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
+                     ctx.strokeStyle = "blue";
+                     ctx.stroke();
+                  }
+                  else {
+                     for (let b = 0; b < 4; b++) {
+                        response[wordList[0]][b] = response[wordList[0]][b].replace('(', '');
+                        response[wordList[0]][b] = response[wordList[0]][b].replace(')', '');
+                        coords = response[wordList[0]][b].split(',');
+                        if (b == 0) {
+                           ctx.moveTo(parseInt(coords[0]), parseInt(coords[1]));
+                           originalCoords = coords;
+                           prevCoords = coords;
+                        }
+                        else if ((b == 1) || (b == 2)) {
+                           response[wordList[(wordList.length-1)]][b] = response[wordList[(wordList.length-1)]][b].replace('(', '');
+                           response[wordList[(wordList.length-1)]][b] = response[wordList[(wordList.length-1)]][b].replace(')', '');
+                           coords = response[wordList[(wordList.length-1)]][b].split(',');
+                           ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
+                           ctx.lineTo(parseInt(coords[0]), parseInt(coords[1]));
+                           prevCoords = coords;
+                        }
+                        else {
+                           ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
+                           ctx.lineTo(parseInt(coords[0]), parseInt(coords[1]));
+                           prevCoords = coords;
+                           
+                        }
+                     }
+                     ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
+                     ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
+                     ctx.strokeStyle = "blue";
+                     ctx.stroke();
+                  }
+               }
+               document.getElementById("photoText").innerHTML = response;
+            }
          });
       };
-      /*
-      function snapshot() {
-         // Draws current image from the video element into the canvas
-         ctx.drawImage(video, 0,0, canvas.width, canvas.height - 50);
-         var dataURL = canvas.toDataURL("image/png");
-         
-         //var newTab = window.open('about:blank','image from canvas');
-         //newTab.document.write("<img src='" + dataURL + "' alt='from canvas'/>");
-         //alert(dataURL)
-
-         var text = dataURL;
-
-         $.ajax({
-            type: "POST",
-            url: "{{ 'my-ajax-test/' }}",
-            data: { csrfmiddlewaretoken: '{{ csrf_token }}', text: text },
-            success: function callback(response){
-                        console.log(response);
-                     }
-         });
-      }
-      */
-         
-
-/*
-var a = document.createElement('a');
-a.href = "img.png";
-a.download = "output.png";
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-*/
-
-
   </script>
 </html>
-<!--<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Display Webcam Stream</title>
- 
-<style>
-#container {
-	margin: 0px auto;
-	width: 500px;
-	height: 375px;
-	border: 10px #333 solid;
-}
-#videoElement {
-	width: 500px;
-	height: 375px;
-	background-color: #666;
-}
-</style>
-</head>
- 
-<body>
-<div id="container">
-	<video autoplay="true" id="videoElement">
-	
-	</video>
-</div>
-<script>
-    var video = document.querySelector("#videoElement");
-
-    if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(function (stream) {
-        video.srcObject = stream;
-        })
-        .catch(function (err0r) {
-        console.log("Something went wrong!");
-        });
-    }
-</script>
-</body>
-</html>
--->

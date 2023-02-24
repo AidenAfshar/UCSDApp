@@ -17,7 +17,7 @@ publisher = pubsub_v1.PublisherClient()
 storage_client = storage.Client()
 
 project_id = "tranquil-sunup-376804"
-credential_path = "/Users/aidenafshar/Documents/UCSDApp/UCSDApp/tranquil-sunup-376804-1a86726987a6.json"
+credential_path = "/Users/aidenafshar/Documents/UCSDApp/UCSDApp/tranquil-sunup-376804-1a86726987a6.json" # Change this
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
 
@@ -38,7 +38,7 @@ def detect_text_local(path):
 
     response = client.text_detection(image=image)
     texts = response.text_annotations
-    print('Texts:')
+    #print('Texts:')
     textAndCoords = {}
 
     for text in texts:
@@ -57,7 +57,8 @@ def detect_text_local(path):
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
 
-    textAndCoords = json.dumps(textAndCoords)
+    # Using JSON format because javascript doesn't recognize python dictionaries
+    textAndCoords = json.dumps(textAndCoords) 
     
     return textAndCoords
 
@@ -65,6 +66,6 @@ def index(request):
     return render(request, 'ucsdapp/index.html')
 
 def myajaxtestview(request):
-    filename = request.POST['text'] 
+    filename = request.POST['text'] # Gets the DataUrl from Javascript/ajax  
     textAndCoords = detect_text_local(filename)
     return HttpResponse(textAndCoords)

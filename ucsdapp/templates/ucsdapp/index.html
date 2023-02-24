@@ -69,39 +69,30 @@
 
      }
 
-     function drawbackground(canvas, context, onload){
-
-         var imagePaper = new Image();
-            imagePaper.onload = function(){
-               context.drawImage(imagePaper,100, 20, 500,500);
-               onload(canvas, context);
-            };
-         imagePaper.src = "images/main_timerand3papers.png";
-         }
-
      function snapshot () {
-         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-         var text = canvas.toDataURL('image/png', 1.0);
+         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
+         var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
          
-         text = text.slice(22);
+         text = text.slice(22); // Removes "data:image..." prefix from the dataUrl
 
          $.ajax({
             type: "POST",
             url: "{{ 'my-ajax-test/' }}",
             data: { csrfmiddlewaretoken: '{{ csrf_token }}', text: text },
-            success: function callback(response){
-               response = JSON.parse(response);
+            success: function callback(response){ // Gives a dictionary of the text in the image and their coordinates
+               response = JSON.parse(response); // Parses the returned list into a json object 
                var originalCoords;
                var prevCoords;
-               var fullText = String(Object.keys(response)).split("\n");
+               var fullText = String(Object.keys(response)).split("\n"); // Creates a string of the words found in the image
                for (var i = 0; i < (fullText.length); i++) {
-                  var wordList = fullText[i].split(" ");
+                  var wordList = fullText[i].split(" "); // Splits each line into a list of words
                   ctx.beginPath();
                   if (wordList.length == 1) {
                      for (let j = 0; j < 4; j++) {
-                        response[wordList][j] = response[wordList][j].replace('(', '');
+                        response[wordList][j] = response[wordList][j].replace('(', ''); // Gets and reformats coordinates
                         response[wordList][j] = response[wordList][j].replace(')', '');
                         coords = response[wordList][j].split(',');
+                        // Drawing vertices/rectangle
                         if (j == 0) {
                            ctx.moveTo(parseInt(coords[0]), parseInt(coords[1]));
                            originalCoords = coords;
@@ -110,11 +101,13 @@
                            ctx.lineTo(parseInt(coords[0]), parseInt(coords[1]));
                         }
                      }
+                     // Drawing last line to first point
                      ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
                      ctx.strokeStyle = "blue";
                      ctx.stroke();
                   }
                   else {
+                     // For lines with more than 1 word, uses coordinates of first and last word in line
                      for (let b = 0; b < 4; b++) {
                         response[wordList[0]][b] = response[wordList[0]][b].replace('(', '');
                         response[wordList[0]][b] = response[wordList[0]][b].replace(')', '');

@@ -5,6 +5,7 @@ from django.http import JsonResponse
 import base64
 import json
 import os
+import re
 
 from google.cloud import pubsub_v1
 from google.cloud import storage
@@ -17,9 +18,6 @@ publisher = pubsub_v1.PublisherClient()
 storage_client = storage.Client()
 
 project_id = "tranquil-sunup-376804"
-credential_path = "/Users/aidenafshar/Documents/UCSDApp/UCSDApp/tranquil-sunup-376804-1a86726987a6.json" # Change this
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
-
 
 def detect_text_local(path):
     """Detects text in the file."""
@@ -42,7 +40,9 @@ def detect_text_local(path):
     textAndCoords = {}
 
     for text in texts:
-       # print('\n"{}"'.format(text.description))
+        #print('\n"{}"'.format(text.description))
+        text.description = re.sub("[!,*)@#%(&$_?.^]", '', text.description)
+
 
         vertices = (['({},{})'.format(vertex.x, vertex.y)
                     for vertex in text.bounding_poly.vertices])

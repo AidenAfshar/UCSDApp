@@ -82,12 +82,19 @@
                response = JSON.parse(response); // Parses the returned list into a json object 
                var originalCoords;
                var prevCoords;
+               alert(Object.keys(response))
                var fullText = String(Object.keys(response)).split("\n"); // Creates a string of the words found in the image
-               alert(fullText)
+               alert(fullText);
                for (var i = 0; i < (fullText.length); i++) {
+                  //alert(fullText[i]);
                   var wordList = fullText[i].split(" "); // Splits each line into a list of words
                   ctx.beginPath();
                   if (wordList.length == 1) {
+                     if (response[wordList] == undefined) {
+                        //alert("undefined")
+                        //alert(fullText);
+                        //alert(wordList)
+                     }
                      for (let j = 0; j < 4; j++) {
                         response[wordList][j] = response[wordList][j].replace('(', ''); // Gets and reformats coordinates
                         response[wordList][j] = response[wordList][j].replace(')', '');

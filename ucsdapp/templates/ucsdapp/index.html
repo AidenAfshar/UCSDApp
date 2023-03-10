@@ -19,6 +19,7 @@
   </body>
   
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
   <script>
 
       //--------------------
@@ -73,7 +74,7 @@
          var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
          
          text = text.slice(22); // Removes "data:image..." prefix from the dataUrl
-
+      
          $.ajax({
             type: "POST",
             url: "{{ 'my-ajax-test/' }}",

@@ -69,11 +69,44 @@
         ctx = canvas.getContext('2d');
      }
 
+     async function postData(filename) {
+            // Default options are marked with *
+            const response = await fetch(' https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ', {
+               method: "POST",
+               mode: "cors", // no-cors, *cors, same-origin
+               cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+               credentials: "same-origin", // include, *same-origin, omit
+               headers: {
+                  "Content-Type": "application/json",
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+               },
+               redirect: "follow", // manual, *follow, error
+               referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+               requests: [
+                  {
+                     image: {
+                        content: filename
+                     },
+                     features: [
+                        {
+                           type: 'TEXT_DETECTION'
+                        }
+                     ]
+                  }
+               ]
+            });
+            return response.json(); // parses JSON response into native JavaScript objects
+         }
+
      function snapshot () {
          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
          var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
          
          filename = text.slice(22); // Removes "data:image..." prefix from the dataUrl
+
+         data = postData(filename);
+
+         alert(data);
 
          /*
          var xhttp = new XMLHttpRequest();
@@ -86,6 +119,12 @@
          xhttp.send(text);
 
          */
+
+         /*
+            postData("https://example.com/answer", { answer: 42 }).then((data) => {
+            console.log(data); // JSON data parsed by `data.json()` call
+            });
+
          $.post(
             'https://vision.googleapis.com/v1/images:annotate',
             {
@@ -103,6 +142,7 @@
                ]
             }
          );
+         */
 
          /*$.ajax({
             type: "POST",

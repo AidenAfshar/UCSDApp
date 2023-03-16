@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body onload="init();">
+    <h1>Take a snapshot of the current video stream</h1>
+   Click on the Start WebCam button.
+     <p>
+    <button onclick="startWebcam();">Start WebCam</button>
+       <button onclick="snapshot();">Take Snapshot</button> 
+    </p>
+    <video onclick="snapshot(this);" width=400 height=400 id="video" autoplay></video>
+  <p>
+
+        Screenshots : <p>
+      <canvas  id="myCanvas" width="400" height="350"></canvas>
+   </p>
+   <p id = "photoText"></p>
+  </body>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
+  <script>
+
+      //--------------------
+      // GET USER MEDIA CODE
+      //--------------------
+          navigator.getUserMedia = ( navigator.getUserMedia ||
+                             navigator.webkitGetUserMedia ||
+                             navigator.mozGetUserMedia ||
+                             navigator.msGetUserMedia);
+
+      var video;
+      var webcamStream;
+      const screenshotImage = document.querySelector('img');
+            
+      function startWebcam() {
+        if (navigator.getUserMedia) {
+           navigator.getUserMedia (
+
+              // constraints
+              {
+                 video: true,
+                 audio: false,
+                 facingMode: {exact: 'environment'},
+              },
+
+              // successCallback
+              function(localMediaStream) {
+                  video = document.querySelector('video');
+                  video.srcObject=localMediaStream;
+                  awebcamStream = localMediaStream;
+              },
+
+              // errorCallback
+              function(err) {
+                 console.log("The following error occured: " + err);
+              }
+           );
+        } else {
+           console.log("getUserMedia not supported");
+        }  
+      }
+      
+      var canvas, ctx;
+
+      function init() {
+        canvas = document.getElementById("myCanvas");
+        ctx = canvas.getContext('2d');
+     }
+
+     function snapshot () {
+         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
+         var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
+         
+         filename = text.slice(22); // Removes "data:image..." prefix from the dataUrl
+
+         /*
+         var xhttp = new XMLHttpRequest();
+         xhttp.onreadystatechange = function() {
+               if (this.readyState == 4 && this.status == 200) {
+                  alert(this.responseText);
+               }
+         };
+         xhttp.open("POST","https://vision.googleapis.com/v1/images:annotate", true);
+         xhttp.send(text);
+
+         */
+         $.post(
+            'https://vision.googleapis.com/v1/images:annotate',
+            {
+               requests: [
+                  {
+                     image: {
+                        content: filename
+                     },
+                     features: [
+                        {
+                           type: 'TEXT_DETECTION'
+                        }
+                     ]
+                  }
+               ]
+            }
+         );
+
+         /*$.ajax({
+            type: "POST",
+            url: "https://vision.googleapis.com/v1/images:annotate",
+            requests: [
+                  {
+                     "image": {
+                     "content": text
+                     },
+                     "features": [
+                     {
+                        "type": "TEXT_DETECTION"
+                     }
+                     ]
+                  }
+               ],
+         })*/
+         /*
+      
+         $.ajax({
+            type: "POST",
+            url: "{{ 'my-ajax-test/' }}",
+            data: { csrfmiddlewaretoken: '{{ csrf_token }}', text: text },
+            success: function callback(response){ // Gives a dictionary of the text in the image and their coordinates
+               response = JSON.parse(response); // Parses the returned list into a json object 
+               var originalCoords;
+               var prevCoords;
+               alert(Object.keys(response))
+               var fullText = String(Object.keys(response)).split("\n"); // Creates a string of the words found in the image
+               alert(fullText);
+               for (var i = 0; i < (fullText.length); i++) {
+                  //alert(fullText[i]);
+                  var wordList = fullText[i].split(" "); // Splits each line into a list of words
+                  ctx.beginPath();
+                  if (wordList.length == 1) {
+                     if (response[wordList] == undefined) {
+                        //alert("undefined")
+                        //alert(fullText);
+                        //alert(wordList)
+                     }
+                     for (let j = 0; j < 4; j++) {
+                        response[wordList][j] = response[wordList][j].replace('(', ''); // Gets and reformats coordinates
+                        response[wordList][j] = response[wordList][j].replace(')', '');
+                        coords = response[wordList][j].split(',');
+                        // Drawing vertices/rectangle
+                        if (j == 0) {
+                           ctx.moveTo(parseInt(coords[0]), parseInt(coords[1]));
+                           originalCoords = coords;
+                        }
+                        else {
+                           ctx.lineTo(parseInt(coords[0]), parseInt(coords[1]));
+                        }
+                     }
+                     // Drawing last line to first point
+                     ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
+                     ctx.strokeStyle = "blue";
+                     ctx.stroke();
+                  }
+                  else {
+                     // For lines with more than 1 word, uses coordinates of first and last word in line
+                     for (let b = 0; b < 4; b++) {
+                        response[wordList[0]][b] = response[wordList[0]][b].replace('(', '');
+                        response[wordList[0]][b] = response[wordList[0]][b].replace(')', '');
+                        coords = response[wordList[0]][b].split(',');
+                        if (b == 0) {
+                           ctx.moveTo(parseInt(coords[0]), parseInt(coords[1]));
+                           originalCoords = coords;
+                           prevCoords = coords;
+                        }
+                        else if ((b == 1) || (b == 2)) {
+                           response[wordList[(wordList.length-1)]][b] = response[wordList[(wordList.length-1)]][b].replace('(', '');
+                           response[wordList[(wordList.length-1)]][b] = response[wordList[(wordList.length-1)]][b].replace(')', '');
+                           coords = response[wordList[(wordList.length-1)]][b].split(',');
+                           ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
+                           ctx.lineTo(parseInt(coords[0]), parseInt(coords[1]));
+                           prevCoords = coords;
+                        }
+                        else {
+                           ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
+                           ctx.lineTo(parseInt(coords[0]), parseInt(coords[1]));
+                           prevCoords = coords;
+                           
+                        }
+                     }
+                     ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
+                     ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
+                     ctx.strokeStyle = "blue";
+                     ctx.stroke();
+                  }
+               }
+               document.getElementById("photoText").innerHTML = response;
+            }
+         });
+      */
+      };
+  </script>
+</html>

@@ -81,17 +81,15 @@
          e.onload=function(){
             console.log(e.responseText);
             response = JSON.parse(e.responseText); 
-            alert(JSON.stringify(response["responses"][0]));
-            alert(JSON.stringify(response["responses"][0]["textAnnotations"][2]))
-            //var fullText = String(Object.keys(response["responses"][0]["textAnnotations"])).split("\n"); // Creates a string of the words found in the image
-            //alert(fullText)
+            alert(JSON.stringify(response["responses"][0]["textAnnotations"]));
+
+            //for (let f = 0; f < fullText.length)
+            var fullText = String(response["responses"][0]["textAnnotations"][0]["description"]).split("\n"); // Creates a string of the words found in the image
+            alert(fullText)
             
 
-            /*
             var originalCoords;
             var prevCoords;
-            var fullText = String(Object.keys(e.responseText)).split("\n"); // Creates a string of the words found in the image
-            alert(fullText);
             for (var i = 0; i < (fullText.length); i++) {
                //alert(fullText[i]);
                var wordList = fullText[i].split(" "); // Splits each line into a list of words

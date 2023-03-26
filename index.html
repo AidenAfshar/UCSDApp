@@ -82,21 +82,23 @@
             console.log(e.responseText);
             response = JSON.parse(e.responseText);
             var textAndCoords = {};
+            var text = {};
             //alert(JSON.stringify(response["responses"][0]["textAnnotations"]));
 
             //for (let f = 0; f < fullText.length)
             //var fullText = String(response["responses"][0]["textAnnotations"][0]["description"]).replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '').split("\n"); // Creates a string of the words found in the image
             //alert(fullText);
             //alert(fullText)
-            for (text in response["responses"][0][textAnnotations]) {
+            for (let i = 0; i < response["responses"][0]["textAnnotations"].length; i++) {
+               alert(JSON.stringify(text["description"] = response["responses"][0]["textAnnotations"][i]));
+               text["description"] = response["responses"][0]["textAnnotations"][i]["description"].replace("[!,*)@#%(&$_?.^]", '',);
+               
 
-               text.description = re.sub("[!,*)@#%(&$_?.^]", '', text.description)
-
-               for (vertex in text.bounding_poly.vertices) {
-                  vertices = (['({},{})'.format(vertex.x, vertex.y)])
+               for (vertex in response["responses"][0]["textAnnotations"][i]["bounding_poly"]["vertices"]) {
+                  vertices = (['({},{})'.format(vertex["x"], vertex["y"])]);
                }
 
-               textAndCoords[text.description] = vertices
+               textAndCoords[text["description"]] = vertices;
             }
 
             var coords;
@@ -106,7 +108,9 @@
             var wordList;
 
             var fullText = String(Object.keys(textAndCoords)).split("\n"); // Creates a string of the words found in the image
+            alert(fullText);
 
+            /*
             for (var i = 0; i < (fullText.length); i++) {
                //alert(fullText[i]);
                var wordList = fullText[i].split(" "); // Splits each line into a list of words
@@ -168,9 +172,11 @@
                   ctx.stroke();
                }
             }
+            */
          }
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1
          e.send(b);
+         
 
          /*$.ajax({
             type: "POST",

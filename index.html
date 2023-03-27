@@ -83,6 +83,7 @@
             response = JSON.parse(e.responseText);
             var textAndCoords = {};
             var text = {};
+            var vertices;
             //alert(JSON.stringify(response["responses"][0]["textAnnotations"]));
 
             //for (let f = 0; f < fullText.length)
@@ -90,34 +91,39 @@
             //alert(fullText);
             //alert(fullText)
             for (let i = 0; i < response["responses"][0]["textAnnotations"].length; i++) {
-               alert(JSON.stringify(text["description"] = response["responses"][0]["textAnnotations"][i]));
-               text["description"] = response["responses"][0]["textAnnotations"][i]["description"].replace("[!,*)@#%(&$_?.^]", '',);
+               vertices = [];
+               text["description"] = response["responses"][0]["textAnnotations"][i]["description"].replace('[^A-Za-z0-9]', '');
                
 
-               for (vertex in response["responses"][0]["textAnnotations"][i]["bounding_poly"]["vertices"]) {
-                  vertices = (['({},{})'.format(vertex["x"], vertex["y"])]);
+               /*for (index in response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"]) {
+                  vertices = (['(' + index["x"] + ',' + index["y"] + ')']);
+               }*/
+               
+               for (index in response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"]) {
+                  vertices.push('('+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"] + ','+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"] + ')');
                }
-
                textAndCoords[text["description"]] = vertices;
+
             }
 
             var coords;
 
             var originalCoords;
             var prevCoords;
-            var wordList;
+            var wordList = [];
 
-            var fullText = String(Object.keys(textAndCoords)).split("\n"); // Creates a string of the words found in the image
+            //alert(Object.keys(textAndCoords));
+
+            var fullText = String(Object.keys(textAndCoords)).replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '').split('\n'); // Creates a string of the words found in the image\
             alert(fullText);
-
-            /*
+         
             for (var i = 0; i < (fullText.length); i++) {
-               //alert(fullText[i]);
-               var wordList = fullText[i].split(" "); // Splits each line into a list of words
+               wordList = fullText[i].split(" "); // Splits each line into a list of words
+               alert(wordList);
+
                ctx.beginPath();
                if (wordList.length == 1) {
                   if (textAndCoords[wordList] == undefined) {
-                     //alert("undefined")
                      //alert(fullText);
                      //alert(wordList)
                   }
@@ -127,8 +133,7 @@
                      coords = textAndCoords[wordList][j].split(',');
                      // Drawing vertices/rectangle
                      if (j == 0) {
-                        ctx.moveTo(parseInt(coords[0]), parseInt(coords[1
-                        ]));
+                        ctx.moveTo(parseInt(coords[0]), parseInt(coords[1]));
                         originalCoords = coords;
                      }
                      else {
@@ -141,6 +146,7 @@
                   ctx.stroke();
                }
                else {
+                  alert(wordList);
                   // For lines with more than 1 word, uses coordinates of first and last word in line
                   for (let b = 0; b < 4; b++) {
                      textAndCoords[wordList[0]][b] = textAndCoords[wordList[0]][b].replace('(', '');
@@ -172,7 +178,7 @@
                   ctx.stroke();
                }
             }
-            */
+            
          }
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1
          e.send(b);

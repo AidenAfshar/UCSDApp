@@ -114,15 +114,16 @@
 
             //alert(Object.keys(textAndCoords));
 
-            var fullText = String(Object.keys(textAndCoords)).replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '').split('\n'); // Creates a string of the words found in the image\
+            var fullText = Object.keys(textAndCoords)[0].split('\n'); // Creates a string of the words found in the image
+            //var fullText = String(Object.keys(textAndCoords)).split('[^a-zA-Z0-9]'); // Creates a string of the words found in the image\
             alert(fullText);
          
-            for (var i = 0; i < (fullText.length); i++) {
-               wordList = fullText[i].split(" "); // Splits each line into a list of words
-               alert(wordList);
+            for (var i = 1; i < (fullText.length); i++) {
+               wordList = fullText[i].split(/[^A-Za-z]/); // Splits each line into a list of words
 
                ctx.beginPath();
                if (wordList.length == 1) {
+                  alert(wordList);
                   if (textAndCoords[wordList] == undefined) {
                      //alert(fullText);
                      //alert(wordList)

@@ -46,37 +46,21 @@
      }
 
      
-
-     function csvToJSON(csv) {
-         var lines = csv.split("\n");
-         var result = [];
-         var headers;
-         headers = lines[0].split(",");
-   
-         for (var i = 1; i < lines.length; i++) {
-            var obj = {};
-   
-            if(lines[i] == undefined || lines[i].trim() == "") {
-               continue;
-            }
-   
-            var words = lines[i].split(",");
-            for(var j = 0; j < words.length; j++) {
-               obj[headers[j].trim()] = words[j];
-            }
-   
-            result.push(obj);
+   // parse_tsv(tsvstring, function (row) { do something with row })  
+   function parse_tsv(s) {
+      var parsedArray = [];
+      var ix_end = 0;
+      for (var ix=0; ix<s.length; ix=ix_end+1) {
+         ix_end = s.indexOf('\n', ix);
+         if (ix_end == -1) {
+            ix_end = s.length;
          }
-         console.log(result);
+         var row = s.substring(ix, ix_end-1).split('\t');
+         //f(row);
+         parsedArray.push(row);
       }
-      
-      function readTextFile(file)
-         {
-            alert(file);
-            fetch(file)
-               .then(response => response.text())
-               .then(text => console.log(text))
-         }
+      return parsedArray;
+   }
       
      function snapshot () {
          var fileName = document.getElementById("dataCSV");

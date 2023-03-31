@@ -1,4 +1,3 @@
-import("jquery-csv");
 //--------------------
       // GET USER MEDIA CODE
       //--------------------
@@ -48,37 +47,43 @@ import("jquery-csv");
 
      
 
-     function parseCSV(fileContents) {
-      $( document ).ready(function() {
-        
-        var data = $.csv.toObjects(fileContents);
-        console.log(data);
-       });
-
+     function csvToJSON(csv) {
+         var lines = csv.split("\n");
+         var result = [];
+         var headers;
+         headers = lines[0].split(",");
+   
+         for (var i = 1; i < lines.length; i++) {
+            var obj = {};
+   
+            if(lines[i] == undefined || lines[i].trim() == "") {
+               continue;
+            }
+   
+            var words = lines[i].split(",");
+            for(var j = 0; j < words.length; j++) {
+               obj[headers[j].trim()] = words[j];
+            }
+   
+            result.push(obj);
+         }
+         console.log(result);
       }
       
       function readTextFile(file)
          {
-            var rawFile = new XMLHttpRequest();
-            rawFile.open("GET", file, false);
-            rawFile.onreadystatechange = function ()
-            {
-               if(rawFile.readyState === 4)
-               {
-                     if(rawFile.status === 200 || rawFile.status == 0)
-                     {
-                        var allText = rawFile.responseText;
-                        alert(allText);
-                     }
-               }
-            }
-            rawFile.send(null);
+            alert(file);
+            fetch(file)
+               .then(response => response.text())
+               .then(text => console.log(text))
          }
       
      function snapshot () {
-        fileName = document.getElementById("dataCSV");
-         fileContents = readTextFile(fileName);
-         parseCSV(fileContents);
+         var fileName = document.getElementById("dataCSV");
+         alert(fileName.value);
+         var fileContents = readTextFile("file:\\\\\\" + fileName.value);
+         alert(fileContents); 
+         csvToJSON(fileContents);
          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
          var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
          

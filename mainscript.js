@@ -1,3 +1,5 @@
+var shapes = [];
+
 //--------------------
       // GET USER MEDIA CODE
       //--------------------
@@ -1425,12 +1427,16 @@
                threshold: 0.1
              }
 
-            var coordinates = [];
-            var textInfo;
+            
+            var shapeCoords = [];
+            var shapeXCoords = [];
+            var shapeYCoords = [];
          
             for (var i = 1; i < (fullText.length); i++) {
 
-               textInfo = {}; // Resetting value
+               shapeCoords = [];
+               shapeXCoords = [];
+               shapeYCoords = [];
 
                wordList = fullText[i].split(/[^A-Za-z]/); // Splits each line into a list of words
                
@@ -1442,8 +1448,6 @@
 
 
                for (var k = 0; k <result.length; k++){
-                  textInfo["link"] = fullDatabase[result[k]["item"]];
-                  alert(textInfo["link"]);
                   console.log(
                         "Original: " + fullText[i] +
                         "\nResult: " +
@@ -1463,6 +1467,8 @@
                      textAndCoords[wordList][j] = textAndCoords[wordList][j].replace('(', ''); // Gets and reformats coordinates
                      textAndCoords[wordList][j] = textAndCoords[wordList][j].replace(')', '');
                      coords = textAndCoords[wordList][j].split(',');
+                     shapeXCoords.push(coords[0]);
+                     shapeYCoords.push(coords[1]);
 
                      if (j == 0) {
                         ctx.moveTo(parseInt(coords[0]), parseInt(coords[1]));
@@ -1476,6 +1482,8 @@
                   ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
                   ctx.strokeStyle = "blue";
                   ctx.stroke();
+                  shapeCoords.push(shapeXCoords);
+                  shapeCoords.push(shapeYCoords);
                }
                else {
                   // For lines with more than 1 word, uses coordinates of first and last word in line
@@ -1502,15 +1510,21 @@
                         prevCoords = coords;
                         
                      }
+                     shapeXCoords.push(coords[0]);
+                     shapeYCoords.push(coords[1]);
                   }
                   ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
                   ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
                   ctx.strokeStyle = "blue";
                   ctx.stroke();
+                  shapeCoords.push(shapeXCoords);
+                  shapeCoords.push(shapeYCoords);
                }
+               shapes.push(shapeCoords);
             }
             
          }
+         
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1
          e.send(b);
          
@@ -1522,3 +1536,35 @@
             success: function callback(response){ // Gives a dictionary of the text in the image and their coordinates
                response = JSON.parse(response); // Parses the returned list into a json object*/
       };
+
+function pnpoly( nvert, vertx, verty, testx, testy ) {
+   var i, j, c = false;
+   for( i = 0, j = nvert-1; i < nvert; j = i++ ) {
+         if( ( ( verty[i] > testy ) != ( verty[j] > testy ) ) &&
+            ( testx < ( vertx[j] - vertx[i] ) * ( testy - verty[i] ) / ( verty[j] - verty[i] ) + vertx[i] ) ) {
+               c = !c;
+         }
+   }
+   return c;
+}
+
+canvas = document.getElementById("myCanvas");
+
+canvas.addEventListener("click", (event) => {
+   // Check whether point is inside circle
+
+   for (let i = 0; i<shapes.length; i++) {
+      clicked = pnpoly(4, shapes[i][0], shapes[i][1], event.offsetX, event.offsetY);
+      if (clicked == true) {
+         console.log("clicked");
+      }
+   }
+   
+
+   /*const isPointInPath = ctx.isPointInPath(circle, event.offsetX, event.offsetY);
+   ctx.fillStyle = isPointInPath ? "green" : "red";
+
+   // Draw circle
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
+   ctx.fill(circle);*/
+});

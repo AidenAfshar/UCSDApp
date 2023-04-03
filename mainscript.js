@@ -1553,11 +1553,20 @@ canvas = document.getElementById("myCanvas");
 canvas.addEventListener("click", (event) => {
    // Check whether point is inside circle
 
+   boolNums = [];
    for (let i = 0; i<shapes.length; i++) {
-      clicked = pnpoly(4, shapes[i][0], shapes[i][1], event.offsetX, event.offsetY);
-      if (clicked == true) {
-         console.log("clicked");
+      for (let j = 0; j<=4; j++) {
+         if (j != 3) {
+            boolNums.push((event.offsetX - shapes[i][0][j]) * (shapes[i][1][j + 1] - shapes[i][1][j]) - (shapes[i][0][j + 1] - shapes[i][0][j]) * (event.offsetY - shapes[i][1][j]));
+            //(x - xi) * (yi+1 - yi) - (xi+1 - xi) * (y - yi)
+         }
+         else {
+            boolNums.push((event.offsetX - shapes[i][0][j]) * (shapes[i][1][0] - shapes[i][1][0]) - (shapes[i][0][0] - shapes[i][0][j]) * (event.offsetY - shapes[i][1][j]));
+         }
+            
       }
+      if (boolNums[0]>0 && boolNums[1]>0 && boolNums[2]>0 && boolNums[3]>0 && boolNums[3]) {
+         console.log("clicked");
    }
    
 

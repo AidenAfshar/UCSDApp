@@ -1373,7 +1373,7 @@ var shapeLinks = [];
          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
          var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
          
-         filename = text.slice(22); // Removes "data:image..." prefix from the dataUrl          
+         filename = text.slice(22); // Removes "data:image..." prefix from the dataUrl
 
          // Post Request
          var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"TEXT_DETECTION","maxResults":5}]    } ]});
@@ -1384,23 +1384,12 @@ var shapeLinks = [];
             var textAndCoords = {};
             var text = {};
             var vertices;
-            //alert(JSON.stringify(response["responses"][0]["textAnnotations"]));
-
-            //for (let f = 0; f < fullText.length)
-            //var fullText = String(response["responses"][0]["textAnnotations"][0]["description"]).replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '').split("\n"); // Creates a string of the words found in the image
-            //alert(fullText);
-            //alert(fullText)
-
             for (let i = 0; i < response["responses"][0]["textAnnotations"].length; i++) {
-               
+               // Looping through each word and its coordinates
                
                vertices = [];
-               text["description"] = response["responses"][0]["textAnnotations"][i]["description"].replace('[^A-Za-z0-9]', '');
+               text["description"] = response["responses"][0]["textAnnotations"][i]["description"].replace('[^A-Za-z0-9]', ''); // Removes Special characters
                
-
-               /*for (index in response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"]) {
-                  vertices = (['(' + index["x"] + ',' + index["y"] + ')']);
-               }*/
                
                for (index in response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"]) {
                   vertices.push('('+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"] + ','+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"] + ')');
@@ -1414,21 +1403,18 @@ var shapeLinks = [];
             var originalCoords;
             var prevCoords;
             var wordList = [];
-
-            //alert(Object.keys(textAndCoords));
             
             fullDatabase = parse_tsv();
             
 
-            var fullText = Object.keys(textAndCoords)[0].split('\n'); // Creates a string of the words found in the image
-            //var fullText = String(Object.keys(textAndCoords)).split('[^a-zA-Z0-9]'); // Creates a string of the words found in the image\
+            var fullText = Object.keys(textAndCoords)[0].split('\n'); // List of words separated by line
 
             const options = {
 
-               includeScore: true,
-               tokenize: false,
-               ignoreLocation: true,
-               threshold: 0.1
+               includeScore: true, // Rating allows for options to be shown from lowest to highest score
+               tokenize: false, // Debug measure (tokenize causes each word to be separate)
+               ignoreLocation: true, // Debug measure (we don't care about where in the database the text is, so location doesn't matter)
+               threshold: 0.1 // High threshold = good results
              }
 
             var shapeCoords = [];
@@ -1440,23 +1426,19 @@ var shapeLinks = [];
                shapeXCoords = [];
                shapeYCoords = [];
 
-               wordList = fullText[i].split(/[^A-Za-z]/); // Splits each line into a list of words
+               wordList = fullText[i].split(/[^A-Za-z]/); // Splits each line into a list of words and special characters
                
                const fuse = new Fuse(Object.keys(fullDatabase), options);
           
                const result = fuse.search("'" + fullText[i]);
-               if (result[0] != undefined) {
-                  shapeLinks.push(fullDatabase[result[0]["item"]]);
+               if (result[0] != undefined) { // If found a link
+                  shapeLinks.push(fullDatabase[result[0]["item"]]); // Gets link corresponding to the sentence
                }
                else {
                   shapeLinks.push("No link found");
 
                ctx.beginPath();
                if (wordList.length == 1) {
-                  if (textAndCoords[wordList] == undefined) {
-                     //alert(fullText);
-                     //alert(wordList)
-                  }
                   for (let j = 0; j < 4; j++) {
                      textAndCoords[wordList][j] = textAndCoords[wordList][j].replace('(', ''); // Gets and reformats coordinates
                      textAndCoords[wordList][j] = textAndCoords[wordList][j].replace(')', '');
@@ -1490,6 +1472,7 @@ var shapeLinks = [];
                         prevCoords = coords;
                      }
                      else if ((b == 1) || (b == 2)) {
+                        // Draws to the last word in the sentence (necessary for multi-word lines)
                         textAndCoords[wordList[(wordList.length-1)]][b] = textAndCoords[wordList[(wordList.length-1)]][b].replace('(', '');
                         textAndCoords[wordList[(wordList.length-1)]][b] = textAndCoords[wordList[(wordList.length-1)]][b].replace(')', '');
                         coords = textAndCoords[wordList[(wordList.length-1)]][b].split(',');
@@ -1529,16 +1512,8 @@ var shapeLinks = [];
             
          }
          
-         e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1
+         e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
          e.send(b);
-         
-
-         /*$.ajax({
-            type: "POST",
-            url: "{{ 'my-ajax-test/' }}",
-            data: { csrfmiddlewaretoken: '{{ csrf_token }}', text: text },
-            success: function callback(response){ // Gives a dictionary of the text in the image and their coordinates
-               response = JSON.parse(response); // Parses the returned list into a json object*/
       };
 
 function checkcheck (x, y, cornersX, cornersY) {
@@ -1561,45 +1536,16 @@ function checkcheck (x, y, cornersX, cornersY) {
 
    return odd;
 }
-canvas = document.getElementById("myCanvas");
+
+canvas = document.getElementById("myCanvas"); // Repeated line for use below
 
 canvas.addEventListener("click", (event) => {
    console.log(shapeLinks);
-   //alert(shapeLinks);
-   // Check whether point is inside circle
    for (let i = 0; i<shapes.length; i++) {
       pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0], shapes[i][1]);
       if (pointIn == true) {
          console.log("clicked!");
-         //console.log(shapeLinks[i]);
          window.open(shapeLinks[i], '_blank');
       }
-      //pointIn = checkcheck(event.offsetX, event.offsetY, [116, 232, 228, 112], [81, 97, 126, 110]);
-      //console.log("check2: " + pointIn);
-   
    }
-   /*
-   console.log("________newCoords_______")
-   for (let i = 0; i<shapes.length; i++) {
-      for (let j = 0; j<4; j++) {
-         console.log("(" + shapes[i][0][0][j] + "," + shapes[i][0][1][j] + ")")
-      }
-      pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0][0], shapes[i][0][1]);
-      console.log(event.offsetX + "|" +  event.offsetY)
-      //if (pointIn != false) {
-      //   alert('clicked');
-      //   window.open(shapes[i][1], '_blank');
-      //}
-      
-      console.log(pointIn);
-      
-      //window.open(shapes[i][1], '_blank').focus();
-   }
-   */
-
-   /*const isPointInPath = ctx.isPointInPath(circle, event.offsetX, event.offsetY);
-   ctx.fillStyle = isPointInPath ? "green" : "red";
-   // Draw circle
-   ctx.clearRect(0, 0, canvas.width, canvas.height);
-   ctx.fill(circle);*/
 });

@@ -1389,15 +1389,7 @@ var shapes = [];
             //var fullText = String(response["responses"][0]["textAnnotations"][0]["description"]).replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '').split("\n"); // Creates a string of the words found in the image
             //alert(fullText);
             //alert(fullText)
-            var shapeCoords = [];
-            var shapeXCoords = [];
-            var shapeYCoords = [];
-
             for (let i = 0; i < response["responses"][0]["textAnnotations"].length; i++) {
-               shapeCoords = [];
-               shapeXCoords = [];
-               shapeYCoords = [];
-               
                vertices = [];
                text["description"] = response["responses"][0]["textAnnotations"][i]["description"].replace('[^A-Za-z0-9]', '');
                
@@ -1408,12 +1400,7 @@ var shapes = [];
                
                for (index in response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"]) {
                   vertices.push('('+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"] + ','+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"] + ')');
-                  console.log('('+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"] + ','+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"] + ')')
-                  shapeXCoords.push(response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"]);
-                  shapeYCoords.push(response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"]);
                }
-               shapeCoords.push(shapeXCoords, shapeYCoords);
-               shapes.push(shapeCoords);
                textAndCoords[text["description"]] = vertices;
 
             }
@@ -1440,16 +1427,35 @@ var shapes = [];
                threshold: 0.1
              }
 
-            var shapeLink;
+            
+            var shapeCoords = [];
+            var shapeXCoords = [];
+            var shapeYCoords = [];
          
             for (var i = 1; i < (fullText.length); i++) {
-               
+
+               shapeCoords = [];
+               shapeXCoords = [];
+               shapeYCoords = [];
 
                wordList = fullText[i].split(/[^A-Za-z]/); // Splits each line into a list of words
                
                const fuse = new Fuse(Object.keys(fullDatabase), options);
           
                const result = fuse.search("'" + fullText[i]);
+
+               console.log(fullText[i]);
+
+
+               for (var k = 0; k <result.length; k++){
+                  console.log(
+                        "Original: " + fullText[i] +
+                        "\nResult: " +
+                        result[k]["item"] 
+                        + "\nRating: "
+                        + result[k]["score"]
+                     );
+               }
 
                ctx.beginPath();
                if (wordList.length == 1) {
@@ -1461,6 +1467,9 @@ var shapes = [];
                      textAndCoords[wordList][j] = textAndCoords[wordList][j].replace('(', ''); // Gets and reformats coordinates
                      textAndCoords[wordList][j] = textAndCoords[wordList][j].replace(')', '');
                      coords = textAndCoords[wordList][j].split(',');
+                     shapeXCoords.push(coords[0]);
+                     shapeYCoords.push(coords[1]);
+
                      if (j == 0) {
                         ctx.moveTo(parseInt(coords[0]), parseInt(coords[1]));
                         originalCoords = coords;
@@ -1473,11 +1482,12 @@ var shapes = [];
                   ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
                   ctx.strokeStyle = "blue";
                   ctx.stroke();
+                  shapeCoords.push(shapeXCoords);
+                  shapeCoords.push(shapeYCoords);
                }
                else {
                   // For lines with more than 1 word, uses coordinates of first and last word in line
                   for (let b = 0; b < 4; b++) {
-                     (textAndCoords[wordList[0]][b] = textAndCoords[wordList[0]][b]);
                      textAndCoords[wordList[0]][b] = textAndCoords[wordList[0]][b].replace('(', '');
                      textAndCoords[wordList[0]][b] = textAndCoords[wordList[0]][b].replace(')', '');
                      coords = textAndCoords[wordList[0]][b].split(',');
@@ -1500,22 +1510,17 @@ var shapes = [];
                         prevCoords = coords;
                         
                      }
+                     shapeXCoords.push(coords[0]);
+                     shapeYCoords.push(coords[1]);
                   }
                   ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
                   ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
                   ctx.strokeStyle = "blue";
                   ctx.stroke();
+                  shapeCoords.push(shapeXCoords);
+                  shapeCoords.push(shapeYCoords);
                }
-               for (var k = 0; k <result.length; k++){
-                  console.log(
-                        "Original: " + fullText[i] +
-                        "\nResult: " +
-                        result[k]["item"] 
-                        + "\nRating: "
-                        + result[k]["score"]
-                     );
-                  shapeLink = (fullDatabase[result[k]["item"]]);  
-               }
+               shapes.push(shapeCoords);
             }
             
          }
@@ -1532,58 +1537,38 @@ var shapes = [];
                response = JSON.parse(response); // Parses the returned list into a json object*/
       };
 
-function checkcheck (x, y, cornersX, cornersY) {
-
-   var i; 
-   var j = cornersX.length-1;
-   var odd = false;
-
-   var pX = cornersX;
-   var pY = cornersY;
-
-   for (i=0; i<cornersX.length; i++) {
-         if ((pY[i]< y && pY[j]>=y ||  pY[j]< y && pY[i]>=y)
-            && (pX[i]<=x || pX[j]<=x)) {
-               odd ^= (pX[i] + (y-pY[i])*(pX[j]-pX[i])/(pY[j]-pY[i])) < x; 
+function pnpoly( nvert, vertx, verty, testx, testy ) {
+   var i, j, c = false;
+   for( i = 0, j = nvert-1; i < nvert; j = i++ ) {
+         if( ( ( verty[i] > testy ) != ( verty[j] > testy ) ) &&
+            ( testx < ( vertx[j] - vertx[i] ) * ( testy - verty[i] ) / ( verty[j] - verty[i] ) + vertx[i] ) ) {
+               c = !c;
          }
-
-         j=i; 
    }
-
-   return odd;
+   return c;
 }
+
 canvas = document.getElementById("myCanvas");
 
 canvas.addEventListener("click", (event) => {
    // Check whether point is inside circle
 
+   boolNums = [];
    for (let i = 0; i<shapes.length; i++) {
-      for (let j = 0; j<4; j++) {
-         //console.log(shapes[i][0][0] + "|" + shapes[i][1][1]);
+      for (let j = 0; j<=4; j++) {
+         if (j != 3) {
+            boolNums.push((event.offsetX - shapes[i][0][j]) * (shapes[i][1][j + 1] - shapes[i][1][j]) - (shapes[i][0][j + 1] - shapes[i][0][j]) * (event.offsetY - shapes[i][1][j]));
+            //(x - xi) * (yi+1 - yi) - (xi+1 - xi) * (y - yi)
+         }
+         else {
+            boolNums.push((event.offsetX - shapes[i][0][j]) * (shapes[i][1][0] - shapes[i][1][0]) - (shapes[i][0][0] - shapes[i][0][j]) * (event.offsetY - shapes[i][1][j]));
+         }
+            
       }
+      if (boolNums[0]>0 && boolNums[1]>0 && boolNums[2]>0 && boolNums[3]>0 && boolNums[3]) {
+         console.log("clicked");
    }
    
-   pointIn = checkcheck(event.offsetX, event.offsetY, shapes[1][0], shapes[1][1]);
-   console.log(pointIn);
-
-   /*
-   console.log("________newCoords_______")
-   for (let i = 0; i<shapes.length; i++) {
-      for (let j = 0; j<4; j++) {
-         console.log("(" + shapes[i][0][0][j] + "," + shapes[i][0][1][j] + ")")
-      }
-      pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0][0], shapes[i][0][1]);
-      console.log(event.offsetX + "|" +  event.offsetY)
-      //if (pointIn != false) {
-      //   alert('clicked');
-      //   window.open(shapes[i][1], '_blank');
-      //}
-      
-      console.log(pointIn);
-      
-      //window.open(shapes[i][1], '_blank').focus();
-   }
-   */
 
    /*const isPointInPath = ctx.isPointInPath(circle, event.offsetX, event.offsetY);
    ctx.fillStyle = isPointInPath ? "green" : "red";

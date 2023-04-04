@@ -1408,11 +1408,13 @@ var shapes = [];
                
                for (index in response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"]) {
                   vertices.push('('+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"] + ','+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"] + ')');
+                  console.log('('+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"] + ','+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"] + ')')
                   shapeXCoords.push(response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"]);
                   shapeYCoords.push(response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"]);
                }
-               textAndCoords[text["description"]] = vertices;
                shapeCoords.push(shapeXCoords, shapeYCoords);
+               shapes.push(shapeCoords);
+               textAndCoords[text["description"]] = vertices;
 
             }
 
@@ -1514,7 +1516,6 @@ var shapes = [];
                      );
                   shapeLink = (fullDatabase[result[k]["item"]]);  
                }
-               shapes.push([shapeCoords, shapeLink]);
             }
             
          }
@@ -1556,21 +1557,33 @@ canvas = document.getElementById("myCanvas");
 canvas.addEventListener("click", (event) => {
    // Check whether point is inside circle
 
+   for (let i = 0; i<shapes.length; i++) {
+      for (let j = 0; j<4; j++) {
+         //console.log(shapes[i][0][0] + "|" + shapes[i][1][1]);
+      }
+   }
+   
+   pointIn = checkcheck(event.offsetX, event.offsetY, shapes[1][0], shapes[1][1]);
+   console.log(pointIn);
+
+   /*
    console.log("________newCoords_______")
    for (let i = 0; i<shapes.length; i++) {
       for (let j = 0; j<4; j++) {
          console.log("(" + shapes[i][0][0][j] + "," + shapes[i][0][1][j] + ")")
       }
       pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0][0], shapes[i][0][1]);
-      if (pointIn != false) {
-         alert('clicked');
-      }
-      else{
-         console.log(pointIn);
-      }
+      console.log(event.offsetX + "|" +  event.offsetY)
+      //if (pointIn != false) {
+      //   alert('clicked');
+      //   window.open(shapes[i][1], '_blank');
+      //}
+      
+      console.log(pointIn);
+      
       //window.open(shapes[i][1], '_blank').focus();
    }
-   
+   */
 
    /*const isPointInPath = ctx.isPointInPath(circle, event.offsetX, event.offsetY);
    ctx.fillStyle = isPointInPath ? "green" : "red";

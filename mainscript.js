@@ -1,5 +1,7 @@
 var shapes = [];
 var shapeLinks = [];
+var video;
+
 
 //--------------------
       // GET USER MEDIA CODE
@@ -9,11 +11,36 @@ var shapeLinks = [];
                              navigator.mozGetUserMedia ||
                              navigator.msGetUserMedia);
 
-      var video;
       var webcamStream;
       const screenshotImage = document.querySelector('img');
-            
-      function startWebcam() {
+      document.getElementById("startWebcamButton").addEventListener("click", ()=> {
+         if (navigator.getUserMedia) {
+            navigator.getUserMedia (
+ 
+               // constraints
+               {
+                  video: true,
+                  audio: false,
+                  facingMode: {exact: 'environment'},
+               },
+ 
+               // successCallback
+               function(localMediaStream) {
+                   video = document.querySelector('video');
+                   video.srcObject=localMediaStream;
+                   awebcamStream = localMediaStream;
+               },
+ 
+               // errorCallback
+               function(err) {
+                  console.log("The following error occured: " + err);
+               }
+            );
+         } else {
+            console.log("getUserMedia not supported");
+         }  
+      });
+      /*function startWebcam() {
         if (navigator.getUserMedia) {
            navigator.getUserMedia (
 
@@ -39,7 +66,7 @@ var shapeLinks = [];
         } else {
            console.log("getUserMedia not supported");
         }  
-      }
+      }*/
       
       var canvas, ctx;
 
@@ -1369,7 +1396,9 @@ var shapeLinks = [];
       return parsedDict;
    }
       
-     function snapshot () { 
+   document.getElementById("snapshotButton").addEventListener("click", () => {
+         canvas = document.getElementById("myCanvas"); // Repeated line for use below
+         video = document.querySelector('video');
          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
          var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
          
@@ -1514,7 +1543,8 @@ var shapeLinks = [];
          
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
          e.send(b);
-      };
+      }
+      );
 
 function checkcheck (x, y, cornersX, cornersY) {
 
@@ -1538,6 +1568,8 @@ function checkcheck (x, y, cornersX, cornersY) {
 }
 
 canvas = document.getElementById("myCanvas"); // Repeated line for use below
+
+
 
 canvas.addEventListener("click", (event) => {
    console.log(shapeLinks);

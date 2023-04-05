@@ -19,9 +19,8 @@ var video;
  
                // constraints
                {
-                  video: true,
+                  video: { facingMode: { exact: "environment" } },
                   audio: false,
-                  facingMode: "user"
                },
  
                // successCallback

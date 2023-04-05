@@ -21,7 +21,7 @@ var video;
                {
                   video: true,
                   audio: false,
-                  facingMode: "environment"
+                  facingMode: "user"
                },
  
                // successCallback

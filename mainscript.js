@@ -13,32 +13,32 @@ var video;
 
       var webcamStream;
       const screenshotImage = document.querySelector('img');
-      document.getElementById("startWebcamButton").addEventListener("click", ()=> {
-         if (navigator.getUserMedia) {
-            navigator.getUserMedia (
- 
-               // constraints
-               {
-                  video: { facingMode: { exact: "environment" } },
-                  audio: false,
-               },
- 
-               // successCallback
-               function(localMediaStream) {
-                   video = document.querySelector('video');
-                   video.srcObject=localMediaStream;
-                   awebcamStream = localMediaStream;
-               },
- 
-               // errorCallback
-               function(err) {
-                  console.log("The following error occured: " + err);
-               }
-            );
-         } else {
-            console.log("getUserMedia not supported");
-         }  
-      });
+      if (navigator.getUserMedia) {
+         navigator.getUserMedia (
+
+            // constraints
+            {
+               video: true, // Use this for computer and below for phone
+               //video: { facingMode: { exact: "environment" } },
+               audio: false,
+            },
+
+            // successCallback
+            function(localMediaStream) {
+                  video = document.querySelector('video');
+                  video.srcObject=localMediaStream;
+                  awebcamStream = localMediaStream;
+            },
+
+            // errorCallback
+            function(err) {
+               console.log("The following error occured: " + err);
+            }
+         );
+      } else {
+         console.log("getUserMedia not supported");
+      }  
+   
       /*function startWebcam() {
         if (navigator.getUserMedia) {
            navigator.getUserMedia (
@@ -1448,8 +1448,11 @@ var video;
             var shapeCoords = [];
             var shapeXCoords = [];
             var shapeYCoords = [];
-         
-            for (var i = 1; i < (fullText.length); i++) {
+
+
+            // Check if i should start as be 1 or 0            
+            for (var i = 0; i < (fullText.length); i++) {
+               console.log("looping");
                shapeCoords = [];
                shapeXCoords = [];
                shapeYCoords = [];
@@ -1464,11 +1467,13 @@ var video;
                }
                else {
                   shapeLinks.push("No link found");
+               }
 
                ctx.beginPath();
                if (wordList.length == 1) {
+                  console.log("1 word");
                   for (let j = 0; j < 4; j++) {
-                     textAndCoords[wordList][j] = textAndCoords[wordList][j].replace('(', ''); // Gets and reformats coordinates
+                     textAndCoords[wordList][j] = textAndCoords[wordList][j].replace('(', ''); // Gets and reformats coordinates // Replace with i + 1 instead of wordlist for indexing to avoid repitition errors
                      textAndCoords[wordList][j] = textAndCoords[wordList][j].replace(')', '');
                      coords = textAndCoords[wordList][j].split(',');
                      shapeXCoords.push(parseInt(coords[0]));
@@ -1488,6 +1493,7 @@ var video;
                   ctx.stroke();
                }
                else {
+                  console.log('2 word!');
                   // For lines with more than 1 word, uses coordinates of first and last word in line
                   for (let b = 0; b < 4; b++) {
                      (textAndCoords[wordList[0]][b] = textAndCoords[wordList[0]][b]);
@@ -1537,8 +1543,6 @@ var video;
                   shapeLink = (fullDatabase[result[0]["item"]]);  
                }*/
             }
-            
-         }
          
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
          e.send(b);

@@ -1,18 +1,13 @@
 <!DOCTYPE html>
+<head>
+  <link rel="stylesheet" href="stylesheet.css">
+</head>
 <html>
   <body onload="init();">
-    <h1>Take a snapshot of the current video stream</h1>
-   Click on the Start WebCam button.
-     <p>
-    <button id = "startWebcamButton">Start WebCam</button>
-    <button id = "snapshotButton">Take Snapshot</button> 
-    </p>
-    <video onclick="snapshot(this);" width=400 height=400 id="video" autoplay></video>
-  <p>
-
-        Screenshots : <p>
-      <canvas  id="myCanvas" width="400" height="350"></canvas>
-   </p>
+    <img  id = "ucsdLogo" width = 200vw ; src= "ucsd-logo.jpg">
+    <video width = 400 height = 500 onclick="snapshot(this);" id="video" autoplay></video>
+    <img width = 125vw src = "button.png" id = "snapshotButton"> 
+    <canvas  id="myCanvas"></canvas>
    <p id = "photoText"></p>
   </body>
   

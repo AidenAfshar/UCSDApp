@@ -18,8 +18,8 @@ var video;
 
             // constraints
             {
-               video: true, // Use this for computer and below for phone
-               //video: { facingMode: { exact: "environment" } },
+               //video: true, // Use this for computer and below for phone
+               video: { facingMode: { exact: "environment" } },
                audio: false,
             },
 

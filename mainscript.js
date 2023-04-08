@@ -15,7 +15,7 @@ mediaDevices.getUserMedia({
   // Changing the source of video to current stream.
   video.srcObject = stream;
   video.addEventListener("loadedmetadata", () => {
-    video.play();
+   //video.play();
   });
 })
 .catch(alert);

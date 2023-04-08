@@ -4,3 +4,18 @@ body {
 #ucsdLogo {
     margin-bottom: -5vw;
 }
+#snapshotButton{
+    width: 20vw;
+    margin-top: 4vh;
+    margin-bottom: -5vh;
+}
+video {
+    width: 90vw;
+    height: 75vh;
+    object-fit: cover;
+}
+#mycanvas {
+    width: 90vw;
+    height: 75vh;
+    margin: 200px;
+}

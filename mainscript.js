@@ -1394,7 +1394,9 @@ var video;
       }
       return parsedDict;
    }
-      
+   
+
+
    document.getElementById("snapshotButton").addEventListener("click", () => {
          canvas = document.getElementById("myCanvas"); // Repeated line for use below
          video = document.querySelector('video');

@@ -15,36 +15,10 @@ mediaDevices.getUserMedia({
   // Changing the source of video to current stream.
   video.srcObject = stream;
   video.addEventListener("loadedmetadata", () => {
-   //video.play();
+      video.play();
   });
-  if (mediaDevices.getUserMedia) {
-   mediaDevices.getUserMedia (
-
-      // constraints
-      {
-         //video: true, // Use this for computer and below for phone
-         video: { facingMode: { exact: "environment" } },
-         audio: false,
-      },
-
-      // successCallback
-      function(localMediaStream) {
-            video.srcObject=localMediaStream;
-            awebcamStream = localMediaStream;
-      },
-
-      // errorCallback
-      function(err) {
-         console.log("The following error occured: " + err);
-      }
-   );
-   } 
-   else {
-      console.log("getUserMedia not supported");
-   }  
 })
 .catch(alert);
-
 /*
 //--------------------
       // GET USER MEDIA CODE

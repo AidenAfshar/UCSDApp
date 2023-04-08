@@ -1,8 +1,25 @@
 var shapes = [];
 var shapeLinks = [];
-var video;
+var video = document.getElementById('video');
+var mediaDevices = navigator.mediaDevices;
+video.muted = true;
+// Accessing the user camera and video.
 
+mediaDevices.getUserMedia({
+   //video: true, // Use this for computer and below for phone
+   video: { facingMode: { exact: "environment" } },
+   audio: false
+})
+.then((stream) => {
 
+  // Changing the source of video to current stream.
+  video.srcObject = stream;
+  video.addEventListener("loadedmetadata", () => {
+    video.play();
+  });
+})
+.catch(alert);
+/*
 //--------------------
       // GET USER MEDIA CODE
       //--------------------
@@ -18,14 +35,13 @@ var video;
 
             // constraints
             {
-               //video: true, // Use this for computer and below for phone
-               video: { facingMode: { exact: "environment" } },
+               video: true, // Use this for computer and below for phone
+               //video: { facingMode: { exact: "environment" } },
                audio: false,
             },
 
             // successCallback
             function(localMediaStream) {
-                  video = document.querySelector('video');
                   video.srcObject=localMediaStream;
                   awebcamStream = localMediaStream;
             },
@@ -38,7 +54,7 @@ var video;
       } else {
          console.log("getUserMedia not supported");
       }  
-   
+   */
       /*function startWebcam() {
         if (navigator.getUserMedia) {
            navigator.getUserMedia (

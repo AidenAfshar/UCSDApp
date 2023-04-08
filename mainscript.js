@@ -6,8 +6,8 @@ video.muted = true;
 // Accessing the user camera and video.
 
 mediaDevices.getUserMedia({
-   video: true, // Use this for computer and below for phone
-   //video: { facingMode: { exact: "environment" } },
+   //video: true, // Use this for computer and below for phone
+   video: { facingMode: { exact: "environment" } },
    audio: false
 })
 .then((stream) => {
@@ -17,16 +17,13 @@ mediaDevices.getUserMedia({
   video.addEventListener("loadedmetadata", () => {
    //video.play();
   });
-})
-.catch(alert);
-
-if (mediaDevices.getUserMedia) {
+  if (mediaDevices.getUserMedia) {
    mediaDevices.getUserMedia (
 
       // constraints
       {
-         video: true, // Use this for computer and below for phone
-         //video: { facingMode: { exact: "environment" } },
+         //video: true, // Use this for computer and below for phone
+         video: { facingMode: { exact: "environment" } },
          audio: false,
       },
 
@@ -41,9 +38,13 @@ if (mediaDevices.getUserMedia) {
          console.log("The following error occured: " + err);
       }
    );
-} else {
-   console.log("getUserMedia not supported");
-}  
+   } 
+   else {
+      console.log("getUserMedia not supported");
+   }  
+})
+.catch(alert);
+
 /*
 //--------------------
       // GET USER MEDIA CODE

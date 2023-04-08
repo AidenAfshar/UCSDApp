@@ -10,12 +10,8 @@ body {
     margin-bottom: -5vh;
 }
 video {
-    width: 90vw;
-    height: 75vh;
-    object-fit: cover;
+    object-fit: fill;
 }
 #mycanvas {
-    width: 90vw;
-    height: 75vh;
-    margin: 200px;
+    object-fit: fill;
 }

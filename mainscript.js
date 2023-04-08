@@ -74,7 +74,23 @@ var video;
         ctx = canvas.getContext('2d');
      }
 
+     var canvas = document.getElementById('myCanvas');
+     var ctx    = canvas.getContext('2d');
+     var video  = document.getElementById('video');
+
+
+     // Displays video in canvas element instead of video element for ease of manipulation
      
+     video.addEventListener('play', function () {
+         var $this = this; //cache
+         (function loop() {
+             if (!$this.paused && !$this.ended) {
+                 ctx.drawImage($this, 0, 0, 700, 1500);
+                 setTimeout(loop, 1000 / 30); // drawing at 30fps
+             }
+         })();
+     }, 0);
+
    // parse_tsv(tsvstring, function (row) { do something with row })  
    function parse_tsv() {
       s = `1	STEP	UNDERSTOOD IS A STEP TOWARD BEING HEALED UNDERSTANDING IS A STEP TOWARD BUILDING COMMUNITY I AM TRYING TO FACILITATE INWARD EXPERIENCE BECAUSE PEOPLE	Oliveros, Pauline	“I began to understand that many people felt that they were not being heard (something especially true today, both locally and globally). I recognized that being heard is a step toward being understood. Being understood is a step toward being healed. Understanding is a step toward building community.”	Oliveros, Pauline. "My "American Music": Soundscape, Politics, Technology, Community." American Music 25, no. 4 (Winter, 2007): 393. doi:10.2307/40071676.	https://www.jstor.org/stable/40071676?seq=1  https://www.press.uillinois.edu/journals/am.html  	https://search-library.ucsd.edu/permalink/01UCS_SDI/1vtf07t/cdi_proquest_journals_1374683
@@ -1402,6 +1418,7 @@ var video;
          video = document.querySelector('video');
          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
          var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
+         video.pause();
          
          filename = text.slice(22); // Removes "data:image..." prefix from the dataUrl
 

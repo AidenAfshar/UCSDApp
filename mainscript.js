@@ -1479,7 +1479,7 @@ else{
                // Looping through each word and its coordinates
                
                vertices = [];
-               text["description"] = response["responses"][0]["textAnnotations"][i]["description"].replace('[^A-Za-z0-9]', ''); // Removes Special characters
+               text["description"] = response["responses"][0]["textAnnotations"][i]["description"]//.replace('[^A-Za-z0-9]', ''); // Removes Special characters
                
                
                for (index in response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"]) {
@@ -1521,22 +1521,22 @@ else{
                shapeXCoords = [];
                shapeYCoords = [];
 
-               wordList = fullText[i].split(/[^A-Za-z]/); // Splits each line into a list of words and special characters
+               wordList = fullText[i].split(" "); // Splits each line into a list of words and special characters
                console.log("Wordlist: " + wordList + "\nLength: " + wordList.length);
                
                const fuse = new Fuse(Object.keys(fullDatabase), options);
           
                const result = fuse.search("'" + fullText[i]);
-               if (result[0] != undefined) { // If found a link
+               /*if (result[0] != undefined) { // If found a link
                   shapeLinks.push(fullDatabase[result[0]["item"]]); // Gets link corresponding to the sentence
                }
                else {
                   shapeLinks.push("No link found");
-               }
+               }*/
+               shapeLinks.push(fullText[i]);
                ctx.beginPath();
                if (wordList.length == 1) {
                   for (let j = 0; j < 4; j++) {
-                     alert("1");
                      /*textAndCoords[wordList][j] = textAndCoords[wordList][j].replace('(', ''); // Gets and reformats coordinates // Replace with i + 1 instead of wordlist for indexing to avoid repitition errors
                      textAndCoords[wordList][j] = textAndCoords[wordList][j].replace(')', '');*/
                      coords = textAndCoords[loopNum][1][j]; //textAndCoords[wordList][j].split(',');
@@ -1635,7 +1635,8 @@ canvas.addEventListener("click", (event) => {
    for (let i = 0; i<shapes.length; i++) {
       pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0], shapes[i][1]);
       if (pointIn == true) {
-         window.open(shapeLinks[i], '_blank');
+         //window.open(shapeLinks[i], '_blank');
+         alert(shapeLinks[i]);
       }
    }
 });

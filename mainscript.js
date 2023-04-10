@@ -1527,13 +1527,12 @@ else{
                const fuse = new Fuse(Object.keys(fullDatabase), options);
           
                const result = fuse.search("'" + fullText[i]);
-               /*if (result[0] != undefined) { // If found a link
+               if (result[0] != undefined) { // If found a link
                   shapeLinks.push(fullDatabase[result[0]["item"]]); // Gets link corresponding to the sentence
                }
                else {
                   shapeLinks.push("No link found");
-               }*/
-               shapeLinks.push(fullText[i]);
+               }
                ctx.beginPath();
                if (wordList.length == 1) {
                   for (let j = 0; j < 4; j++) {
@@ -1635,8 +1634,7 @@ canvas.addEventListener("click", (event) => {
    for (let i = 0; i<shapes.length; i++) {
       pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0], shapes[i][1]);
       if (pointIn == true) {
-         //window.open(shapeLinks[i], '_blank');
-         alert(shapeLinks[i]);
+         window.open(shapeLinks[i], '_blank');
       }
    }
 });

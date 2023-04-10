@@ -1521,7 +1521,7 @@ else{
                shapeXCoords = [];
                shapeYCoords = [];
 
-               wordList = fullText[i].split(" "); // Splits each line into a list of words and special characters
+               wordList = fullText[i].split(" "); // Splits each line into a list of words
                console.log("Wordlist: " + wordList + "\nLength: " + wordList.length);
                
                const fuse = new Fuse(Object.keys(fullDatabase), options);

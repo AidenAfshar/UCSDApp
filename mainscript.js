@@ -115,6 +115,7 @@ else{
       function init() {
         canvas = document.getElementById("myCanvas");
         ctx = canvas.getContext('2d');
+        ctx.lineWidth = 3;
      }
 
      var canvas = document.getElementById('myCanvas');
@@ -128,7 +129,7 @@ else{
          var $this = this; //cache
          (function loop() {
              if (!$this.paused && !$this.ended) {
-                 ctx.drawImage($this, 0, 0, 700, 1500);
+                 ctx.drawImage($this, 0, 0, canvas.width, canvas.height);
                  setTimeout(loop, 1000 / 30); // drawing at 30fps
              }
          })();
@@ -1471,7 +1472,7 @@ else{
          e.onload=function(){
             console.log(e.responseText);
             response = JSON.parse(e.responseText);
-            var textAndCoords = {};
+            var textAndCoords = [];
             var text = {};
             var vertices;
             for (let i = 0; i < response["responses"][0]["textAnnotations"].length; i++) {
@@ -1482,11 +1483,11 @@ else{
                
                
                for (index in response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"]) {
-                  vertices.push('('+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"] + ','+ response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"] + ')');
+                  vertices.push([response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"], response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"]]);
                }
-               textAndCoords[text["description"]] = vertices;
-
+               textAndCoords.push([text["description"], vertices]);
             }
+            console.log(textAndCoords);
 
             var coords;
 
@@ -1496,9 +1497,8 @@ else{
             
             fullDatabase = parse_tsv();
             
-
-            var fullText = Object.keys(textAndCoords)[0].split('\n'); // List of words separated by line
-
+            var fullText = textAndCoords[0][0].split('\n'); // First item is the full text separated by \n's, so this allows us to parse through and create links for each lines to show on screen
+            console.log(fullText); 
             const options = {
 
                includeScore: true, // Rating allows for options to be shown from lowest to highest score
@@ -1510,16 +1510,19 @@ else{
             var shapeCoords = [];
             var shapeXCoords = [];
             var shapeYCoords = [];
-
+            var loopNum = 1;
 
             // Check if i should start as be 1 or 0            
-            for (var i = 0; i < (fullText.length); i++) {
-               console.log("looping");
+            for (var i = 0; i < fullText.length; i++) { // +1 to fulltext.length to account for fulltext in textandcoords? (check later)
+               console.log("i: " + i);
+               console.log("loop num: " + loopNum);
+               console.log(textAndCoords[loopNum][0]);
                shapeCoords = [];
                shapeXCoords = [];
                shapeYCoords = [];
 
                wordList = fullText[i].split(/[^A-Za-z]/); // Splits each line into a list of words and special characters
+               console.log("Wordlist: " + wordList + "\nLength: " + wordList.length);
                
                const fuse = new Fuse(Object.keys(fullDatabase), options);
           
@@ -1530,66 +1533,59 @@ else{
                else {
                   shapeLinks.push("No link found");
                }
-
                ctx.beginPath();
                if (wordList.length == 1) {
-                  console.log("1 word");
                   for (let j = 0; j < 4; j++) {
-                     textAndCoords[wordList][j] = textAndCoords[wordList][j].replace('(', ''); // Gets and reformats coordinates // Replace with i + 1 instead of wordlist for indexing to avoid repitition errors
-                     textAndCoords[wordList][j] = textAndCoords[wordList][j].replace(')', '');
-                     coords = textAndCoords[wordList][j].split(',');
-                     shapeXCoords.push(parseInt(coords[0]));
-                     shapeYCoords.push(parseInt(coords[1]));
-                     console.log(coords);
+                     alert("1");
+                     /*textAndCoords[wordList][j] = textAndCoords[wordList][j].replace('(', ''); // Gets and reformats coordinates // Replace with i + 1 instead of wordlist for indexing to avoid repitition errors
+                     textAndCoords[wordList][j] = textAndCoords[wordList][j].replace(')', '');*/
+                     coords = textAndCoords[loopNum][1][j]; //textAndCoords[wordList][j].split(',');
+                     shapeXCoords.push(coords[0]);
+                     shapeYCoords.push(coords[1]);
                      if (j == 0) {
-                        ctx.moveTo(parseInt(coords[0]), parseInt(coords[1]));
+                        ctx.moveTo(coords[0], coords[1]);
                         originalCoords = coords;
                      }
                      else {
-                        ctx.lineTo(parseInt(coords[0]), parseInt(coords[1]));
+                        ctx.lineTo(coords[0], coords[1]);
                      }
                   }
                   // Drawing last line to first point
-                  ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
-                  ctx.strokeStyle = "blue";
+                  ctx.lineTo(originalCoords[0], originalCoords[1]);
+                  ctx.strokeStyle = "red";
                   ctx.stroke();
                }
                else {
-                  console.log('2 word!');
                   // For lines with more than 1 word, uses coordinates of first and last word in line
                   for (let b = 0; b < 4; b++) {
-                     (textAndCoords[wordList[0]][b] = textAndCoords[wordList[0]][b]);
-                     textAndCoords[wordList[0]][b] = textAndCoords[wordList[0]][b].replace('(', '');
-                     textAndCoords[wordList[0]][b] = textAndCoords[wordList[0]][b].replace(')', '');
-                     coords = textAndCoords[wordList[0]][b].split(',');
+                     coords = textAndCoords[loopNum][1][b];
                      if (b == 0) {
-                        ctx.moveTo(parseInt(coords[0]), parseInt(coords[1]));
+                        ctx.moveTo(coords[0], coords[1]);
                         originalCoords = coords;
                         prevCoords = coords;
                      }
                      else if ((b == 1) || (b == 2)) {
                         // Draws to the last word in the sentence (necessary for multi-word lines)
-                        textAndCoords[wordList[(wordList.length-1)]][b] = textAndCoords[wordList[(wordList.length-1)]][b].replace('(', '');
-                        textAndCoords[wordList[(wordList.length-1)]][b] = textAndCoords[wordList[(wordList.length-1)]][b].replace(')', '');
-                        coords = textAndCoords[wordList[(wordList.length-1)]][b].split(',');
-                        ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
-                        ctx.lineTo(parseInt(coords[0]), parseInt(coords[1]));
+                        coords = textAndCoords[loopNum + wordList.length - 1][1][b];
+                        ctx.moveTo(prevCoords[0], prevCoords[1]);
+                        ctx.lineTo(coords[0], coords[1]);
                         prevCoords = coords;
                      }
                      else {
-                        ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
-                        ctx.lineTo(parseInt(coords[0]), parseInt(coords[1]));
+                        ctx.moveTo(prevCoords[0], prevCoords[1]);
+                        ctx.lineTo(coords[0], coords[1]);
                         prevCoords = coords;
                         
                      }
-                     shapeXCoords.push(parseInt(coords[0]));
-                     shapeYCoords.push(parseInt(coords[1]));
+                     shapeXCoords.push(coords[0]);
+                     shapeYCoords.push(coords[1]);
                   }
-                  ctx.moveTo(parseInt(prevCoords[0]), parseInt(prevCoords[1]));
-                  ctx.lineTo(parseInt(originalCoords[0]), parseInt(originalCoords[1]));
-                  ctx.strokeStyle = "blue";
+                  ctx.moveTo(prevCoords[0], prevCoords[1]);
+                  ctx.lineTo(originalCoords[0], originalCoords[1]);
+                  ctx.strokeStyle = "red";
                   ctx.stroke();
                }
+               loopNum += wordList.length;
                shapeCoords.push(shapeXCoords);
                shapeCoords.push(shapeYCoords);
                shapes.push(shapeCoords);
@@ -1635,13 +1631,10 @@ function checkcheck (x, y, cornersX, cornersY) {
 canvas = document.getElementById("myCanvas"); // Repeated line for use below
 
 
-
 canvas.addEventListener("click", (event) => {
-   console.log(shapeLinks);
    for (let i = 0; i<shapes.length; i++) {
       pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0], shapes[i][1]);
       if (pointIn == true) {
-         console.log("clicked!");
          window.open(shapeLinks[i], '_blank');
       }
    }

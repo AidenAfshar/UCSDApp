@@ -1556,11 +1556,21 @@ else{
 
             // Check if i should start as be 1 or 0            
             for (var i = 0; i < fullText.length; i++) { // +1 to fulltext.length to account for fulltext in textandcoords? (check later)
+               wordList = [];
                shapeCoords = [];
                shapeXCoords = [];
                shapeYCoords = [];
 
-               wordList = fullText[i].split(" "); // Splits each line into a list of words
+               wordListTemp = fullText[i].split(" "); // Splits into words
+               for (let l = 0; l<wordListTemp.length; l++) {
+                  tempList = wordListTemp[l].split(/([^0-9a-zA-Z.,'])/g); // Putting the delimiter in "/()/g" Splits on Special Characters while keeping them to avoid indexing issues with google results
+                  console.log("Templist: " + tempList);
+                  for (let k = 0; k<tempList.length; k++){
+                     wordList.push(tempList[k])
+                  }
+               }
+               //wordList = fullText[i].split(/([^A-Za-z])/g); // Splits each line into a list of words
+               console.log("Wordlist: " + wordList);
                
                /*
                for (let c = 0; c<(Object.keys(fullDatabase)).length; c++){ 

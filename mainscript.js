@@ -1569,7 +1569,10 @@ else{
                   tempList = wordListTemp[l].split(/([^0-9a-zA-Z.,'])/g); // Putting the delimiter in "/()/g" Splits on Special Characters while keeping them to avoid indexing issues with google results
                   console.log("Templist: " + tempList);
                   for (let k = 0; k<tempList.length; k++){
-                     wordList.push(tempList[k])
+                     if (tempList[k] != ''){
+                        console.log("Tempitem: " + tempList[k]); // Covers case where special characters are at the beginning or end, because the split creates an empty item when that occurs
+                        wordList.push(tempList[k])
+                     }
                   }
                }
                //wordList = fullText[i].split(/([^A-Za-z])/g); // Splits each line into a list of words

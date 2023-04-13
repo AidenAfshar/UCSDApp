@@ -1511,9 +1511,10 @@ else{
          filename = text.slice(22); // Removes "data:image..." prefix from the dataUrl
 
          // Post Request
-         var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"TEXT_DETECTION","maxResults":5}]    } ]});
+         var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"DOCUMENT_TEXT_DETECTION","maxResults":5}]    } ]});
          var e=new XMLHttpRequest; 
          e.onload=function(){
+            document.getElementById("restartButton").hidden = false;
             console.log(e.responseText);
             response = JSON.parse(e.responseText);
             var textAndCoords = [];
@@ -1541,6 +1542,7 @@ else{
             fullDatabase = parse_tsv();
             
             var fullText = textAndCoords[0][0].split('\n'); // First item is the full text separated by \n's, so this allows us to parse through and create links for each lines to show on screen
+            document.getElementById("debugText").innerHTML = fullText;
             const options = {
 
                includeScore: true, // Rating allows for options to be shown from lowest to highest score
@@ -1563,6 +1565,7 @@ else{
 
                wordListTemp = fullText[i].split(" "); // Splits into words
                for (let l = 0; l<wordListTemp.length; l++) {
+                  // Add cases for "//" and time (00:00:00)
                   tempList = wordListTemp[l].split(/([^0-9a-zA-Z.,'])/g); // Putting the delimiter in "/()/g" Splits on Special Characters while keeping them to avoid indexing issues with google results
                   console.log("Templist: " + tempList);
                   for (let k = 0; k<tempList.length; k++){
@@ -1666,6 +1669,7 @@ else{
                      );
                   shapeLink = (fullDatabase[result[0]["item"]]);  
                }*/
+               //document.getElem
             }
          
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
@@ -1696,6 +1700,12 @@ function checkcheck (x, y, cornersX, cornersY) {
 
 canvas = document.getElementById("myCanvas"); // Repeated line for use below
 
+document.getElementById("restartButton").addEventListener("click", () => {
+   video.play();
+   document.getElementById("restartButton").hidden = true;
+   shapes = []; // Resetting Links;
+}
+)
 
 canvas.addEventListener("click", (event) => {
    for (let i = 0; i<shapes.length; i++) {

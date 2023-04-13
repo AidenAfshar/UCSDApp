@@ -15,3 +15,14 @@ video {
 #mycanvas {
     object-fit: fill;
 }
+#restartButton {
+    width: 5vw;
+}
+#d1 {
+    margin-top: -30vw;
+    display:flex;
+    justify-content: center;
+}
+#header{
+    margin-top: 34vw;
+}

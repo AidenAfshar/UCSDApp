@@ -31,7 +31,7 @@ if (window.mobileCheck() == true){
 else{
    mediaDevices.getUserMedia(
       {
-         video: true, // Use this for computer and below for phone
+         video: { facingMode: { exact: "environment" } }, // Use this for computer and below for phone
          //video: { facingMode: { exact: "environment" } },
          audio: false
       }

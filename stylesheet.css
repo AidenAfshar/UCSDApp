@@ -14,13 +14,13 @@ video {
 }
 #mycanvas {
     object-fit: fill;
+    z-index: 1;
 }
 #restartButton {
     width: 10vw;
 }
 #d1 {
-    margin-left: 25vw;
-    margin-top: -64vw;
+    margin-top: -26vw;
     display:flex;
     justify-content: center;
     z-index: 5;

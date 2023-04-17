@@ -20,7 +20,8 @@ video {
     width: 10vw;
 }
 #d1 {
-    margin-top: -26vw;
+    margin-top: -10vw;
+    margin-left: 30vw;
     display:flex;
     justify-content: center;
     z-index: 5;

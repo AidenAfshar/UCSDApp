@@ -3,6 +3,7 @@ var shapeLinks = [];
 var video = document.getElementById('video');
 var mediaDevices = navigator.mediaDevices;
 video.muted = true;
+var canRestart = false;
 // Accessing the user camera and video.
 
 window.mobileCheck = function() {
@@ -1514,7 +1515,8 @@ else{
          var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"DOCUMENT_TEXT_DETECTION","maxResults":5}]    } ]});
          var e=new XMLHttpRequest; 
          e.onload=function(){
-            document.getElementById("restartButton").hidden = false;
+            document.getElementById("restartButton").src = "restart.png";
+            canRestart = true;
             console.log(e.responseText);
             response = JSON.parse(e.responseText);
             var textAndCoords = [];
@@ -1704,9 +1706,12 @@ function checkcheck (x, y, cornersX, cornersY) {
 canvas = document.getElementById("myCanvas"); // Repeated line for use below
 
 document.getElementById("restartButton").addEventListener("click", () => {
-   video.play();
-   document.getElementById("restartButton").hidden = true;
-   shapes = []; // Resetting Links;
+   if (canRestart) {
+      video.play();
+      document.getElementById("restartButton").src = "restarthalf.png";
+      shapes = []; // Resetting Links;
+      canRestart = false;
+   }
 }
 )
 

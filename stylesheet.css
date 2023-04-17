@@ -19,7 +19,8 @@ video {
     width: 10vw;
 }
 #d1 {
-    margin-top: -30vw;
+    margin-top: -64vw;
+    margin-left: 25vw;
     display:flex;
     justify-content: center;
 }

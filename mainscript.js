@@ -31,8 +31,8 @@ if (window.mobileCheck() == true){
 else{
    mediaDevices.getUserMedia(
       {
-         video: { facingMode: { exact: "environment" } }, // Use this for computer and below for phone
-         //video: { facingMode: { exact: "environment" } },
+         //video: true, // Use this for computer and below for phone
+         video: { facingMode: { exact: "environment" } },
          audio: false
       }
    )
@@ -1542,7 +1542,7 @@ else{
             fullDatabase = parse_tsv();
             
             var fullText = textAndCoords[0][0].split('\n'); // First item is the full text separated by \n's, so this allows us to parse through and create links for each lines to show on screen
-            document.getElementById("debugText").innerHTML = fullText;
+            //document.getElementById("debugText").innerHTML = fullText;
             const options = {
 
                includeScore: true, // Rating allows for options to be shown from lowest to highest score

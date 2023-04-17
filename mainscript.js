@@ -1709,8 +1709,8 @@ document.getElementById("restartButton").addEventListener("click", () => {
    if (canRestart) {
       video.play();
       document.getElementById("restartButton").src = "restarthalf.png";
-      shapes = []; // Resetting Links;
       canRestart = false;
+      shapes = []; // Resetting Links;
    }
 }
 )

@@ -23,6 +23,7 @@ video {
     margin-top: -64vw;
     display:flex;
     justify-content: center;
+    z-index: 5;
 }
 #header{
     margin-top: 34vw;

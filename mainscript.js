@@ -1508,11 +1508,11 @@ else{
          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
          var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
          video.pause();
-         
+
          filename = text.slice(22); // Removes "data:image..." prefix from the dataUrl
 
          // Post Request
-         var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"DOCUMENT_TEXT_DETECTION","maxResults":5}]    } ]});
+         var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"TEXT_DETECTION","maxResults":5}]    } ]});
          var e=new XMLHttpRequest; 
          e.onload=function(){
             document.getElementById("restartButton").src = "restart.png";
@@ -1521,18 +1521,41 @@ else{
             response = JSON.parse(e.responseText);
             var textAndCoords = [];
             var text = {};
-            var vertices;
-            for (let i = 0; i < response["responses"][0]["textAnnotations"].length; i++) {
-               // Looping through each word and its coordinates
-               
-               vertices = [];
-               text["description"] = response["responses"][0]["textAnnotations"][i]["description"]//.replace('[^A-Za-z0-9]', ''); // Removes Special characters
-               
-               
-               for (index in response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"]) {
-                  vertices.push([response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"], response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"]]);
+            var vertices = [];
+            var lines = [];
+            pages = response["responses"][0]["fullTextAnnotation"]["pages"];
+            for (let i = 0; i < pages.length; i++) {
+               for (let j = 0; j < pages[i]["blocks"].length; j++){
+                  for (let l = 0; l < pages[i]["blocks"][j]["paragraphs"].length; l++) {
+                     para = ""
+                     line = ""
+                     for (let k = 0; k < pages[i]["blocks"][j]["paragraphs"][l]["words"].length; k++) {
+                        if (line == "") {
+                           vertices.push([pages[i]["blocks"][j]["paragraphs"][l]["words"][k]["symbols"][0]["boundingBox"]["vertices"][0]["x"], pages[i]["blocks"][j]["paragraphs"][l]["words"][k]["symbols"][0]["boundingBox"]["vertices"][0]["y"]]) // Top left coord (57, 331)
+                           vertices.push([pages[i]["blocks"][j]["paragraphs"][l]["words"][k]["symbols"][0]["boundingBox"]["vertices"][3]["x"], pages[i]["blocks"][j]["paragraphs"][l]["words"][k]["symbols"][0]["boundingBox"]["vertices"][3]["y"]]) // Bottom left coord (54, 524)
+                        }
+                        for (let p = 0; p < pages[i]["blocks"][j]["paragraphs"][l]["words"][k]["symbols"].length; p++) {
+                           symbols = pages[i]["blocks"][j]["paragraphs"][l]["words"][k]["symbols"];
+                           line += symbols[p]["text"];
+                           if (["property"] in symbols[p]){
+                              if (["detectedBreak"] in symbols[p]["property"]) {
+                                 if (symbols[p]["property"]["detectedBreak"]["type"] == "SPACE") {
+                                    line += ' ';
+                                 }
+                                 if (symbols[p]["property"]["detectedBreak"]["type"] == "LINE_BREAK" || symbols[p]["property"]["detectedBreak"]["type"] == "EOL_SURE_SPACE") {
+                                    vertices.push([symbols[p]["boundingBox"]["vertices"][1]["x"], symbols[p]["boundingBox"]["vertices"][1]["y"]]) // Top right coord
+                                    vertices.push([symbols[p]["boundingBox"]["vertices"][2]["x"], symbols[p]["boundingBox"]["vertices"][2]["y"]]) // Bottom right coord
+                                    textAndCoords.push([line, vertices]);
+                                    line = "";
+                                    vertices = [];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                     //paragraphs.push(para);
+                  }
                }
-               textAndCoords.push([text["description"], vertices]);
             }
 
             var coords;
@@ -1543,7 +1566,7 @@ else{
             
             fullDatabase = parse_tsv();
             
-            var fullText = textAndCoords[0][0].split('\n'); // First item is the full text separated by \n's, so this allows us to parse through and create links for each lines to show on screen
+            var fullText = response["responses"][0]["textAnnotations"][0]["description"].split('\n'); // First item is the full text separated by \n's, so this allows us to parse through and create links for each lines to show on screen
             //document.getElementById("debugText").innerHTML = fullText;
             const options = {
 
@@ -1558,129 +1581,56 @@ else{
             var shapeYCoords = [];
             var loopNum = 1; // Used as a parallel to i for looping over a list of each word rather than each line
 
-            // Check if i should start as be 1 or 0            
-            for (var i = 0; i < fullText.length; i++) { // +1 to fulltext.length to account for fulltext in textandcoords? (check later)
-               wordList = [];
-               shapeCoords = [];
-               shapeXCoords = [];
-               shapeYCoords = [];
-
-               wordListTemp = fullText[i].split(" "); // Splits into words
-               for (let l = 0; l<wordListTemp.length; l++) {
-                  // Add cases for "//" and time (00:00:00)
-                  tempList = wordListTemp[l].split(/([^0-9a-zA-Z.,'])/g); // Putting the delimiter in "/()/g" Splits on Special Characters while keeping them to avoid indexing issues with google results
-                  console.log("Templist: " + tempList);
-                  for (let k = 0; k<tempList.length; k++){
-                     if (tempList[k] != ''){
-                        console.log("Tempitem: " + tempList[k]); // Covers case where special characters are at the beginning or end, because the split creates an empty item when that occurs
-                        wordList.push(tempList[k])
-                     }
-                  }
-               }
-               //wordList = fullText[i].split(/([^A-Za-z])/g); // Splits each line into a list of words
-               console.log("Wordlist: " + wordList);
-               
-               /*
-               for (let c = 0; c<(Object.keys(fullDatabase)).length; c++){ 
-                  console.log("looping");
-                  const distance = levenshtein(fullText[i], Object.keys(fullDatabase)[c]);
-                  //console.log("Fultext[i]: " + fullText[i] + "\nObject.keys...: " + Object.keys(fullDatabase)[c]);
-                  if (distance <= 500) {
-                     shapeLinks.push(fullDatabase[Object.keys(fullDatabase)[c]]); // Gets link corresponding to the sentence
-                     console.log("What google found: "+ fullText[i] + "\nOriginal: " + Object.keys(fullDatabase)[c]);
-                  }
-                  else{
-                     shapeLinks.push("No link found")
-                     console.log("no link found");
-                  }
-               }*/
-               
-               //const distance = levenshtein(fullText[i], searchText);
-
+            // Check if i should start as be 1 or 0
+            for (let i = 0; i < textAndCoords.length; i++) {
                const fuse = new Fuse(Object.keys(fullDatabase), options);
           
-               const result = fuse.search("'" + fullText[i]);
+               const result = fuse.search("'" + textAndCoords[i]);
                if (result[0] != undefined) { // If found a link
                   shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence
-                  console.log("Google: "+ fullText[i] + "\nOriginal: " + result[0]["item"] + "\nIndex: " + fullDatabase[result[0]["item"]]["index"]);
+                  console.log("Google: "+ textAndCoords[i] + "\nOriginal: " + result[0]["item"] + "\nIndex: " + fullDatabase[result[0]["item"]]["index"]);
                }
                else {
                   shapeLinks.push("No link found");
                }
-
                ctx.beginPath();
-               if (wordList.length == 1) {
-                  for (let j = 0; j < 4; j++) {
-                     /*textAndCoords[wordList][j] = textAndCoords[wordList][j].replace('(', ''); // Gets and reformats coordinates // Replace with i + 1 instead of wordlist for indexing to avoid repitition errors
-                     textAndCoords[wordList][j] = textAndCoords[wordList][j].replace(')', '');*/
-                     coords = textAndCoords[loopNum][1][j]; //textAndCoords[wordList][j].split(',');
-                     shapeXCoords.push(coords[0]);
-                     shapeYCoords.push(coords[1]);
-                     if (j == 0) {
-                        ctx.moveTo(coords[0], coords[1]);
-                        originalCoords = coords;
-                     }
-                     else {
-                        ctx.lineTo(coords[0], coords[1]);
-                     }
+               for (j = 0; j < 4; j++) {
+                  coords = textAndCoords[i][1][j]
+                  if (j == 0) {
+                     ctx.moveTo(coords[0], coords[1]);
+                     originalCoords = coords;
                   }
-                  // Drawing last line to first point
-                  ctx.lineTo(originalCoords[0], originalCoords[1]);
-                  ctx.strokeStyle = "red";
-                  ctx.stroke();
-               }
-               else {
-                  // For lines with more than 1 word, uses coordinates of first and last word in line
-                  for (let b = 0; b < 4; b++) {
-                     coords = textAndCoords[loopNum][1][b];
-                     if (b == 0) {
-                        ctx.moveTo(coords[0], coords[1]);
-                        originalCoords = coords;
-                        prevCoords = coords;
-                     }
-                     else if ((b == 1) || (b == 2)) {
-                        // Draws to the last word in the sentence (necessary for multi-word lines)
-                        coords = textAndCoords[loopNum + wordList.length - 1][1][b];
-                        ctx.moveTo(prevCoords[0], prevCoords[1]);
-                        ctx.lineTo(coords[0], coords[1]);
-                        prevCoords = coords;
-                     }
-                     else {
-                        ctx.moveTo(prevCoords[0], prevCoords[1]);
-                        ctx.lineTo(coords[0], coords[1]);
-                        prevCoords = coords;
-                        
-                     }
-                     shapeXCoords.push(coords[0]);
-                     shapeYCoords.push(coords[1]);
+                  else if (j == 1) {
+                     coords = textAndCoords[i][1][2];
+                     ctx.lineTo(coords[0], coords[1]);
+                     ctx.moveTo(coords[0], coords[1]);
+                     //ctx.moveTo(coords[0], coords[1]);
                   }
-                  ctx.moveTo(prevCoords[0], prevCoords[1]);
-                  ctx.lineTo(originalCoords[0], originalCoords[1]);
-                  ctx.strokeStyle = "red";
-                  ctx.stroke();
+                  else if (j == 2) {
+                     coords = textAndCoords[i][1][3];
+                     ctx.lineTo(coords[0], coords[1]);
+                     //ctx.moveTo(coords[0], coords[1]);
+                  }
+                  else {
+                     coords = textAndCoords[i][1][1]
+                     //ctx.moveTo(prevCoords);
+                     ctx.lineTo(coords[0], coords[1]);
+                  }
+                  shapeXCoords.push(coords[0]);
+                  shapeYCoords.push(coords[1]);
                }
-               loopNum += wordList.length;
+               ctx.lineTo(originalCoords[0], originalCoords[1]);
+               ctx.strokeStyle = "red";
+               ctx.stroke();
                shapeCoords.push(shapeXCoords);
                shapeCoords.push(shapeYCoords);
                shapes.push(shapeCoords);
-               }
-               /*for (var k = 0; k <result.length; k++){
-                  console.log(
-                        "Original: " + fullText[i] +
-                        "\nResult: " +
-                        result[k]["item"] 
-                        + "\nRating: "
-                        + result[k]["score"]
-                     );
-                  shapeLink = (fullDatabase[result[0]["item"]]);  
-               }*/
-               //document.getElem
+
             }
-         
+         }
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
          e.send(b);
-      }
-      );
+   });
 
 function checkcheck (x, y, cornersX, cornersY) {
 

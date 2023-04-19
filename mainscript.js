@@ -1501,8 +1501,11 @@ else{
       return parsedDict;
    }
 
+   var fullDatabase = parse_tsv();
 
    document.getElementById("snapshotButton").addEventListener("click", () => {
+         var d1 = new Date();
+         console.log("About to start: " + d1.toUTCString());
          canvas = document.getElementById("myCanvas"); // Repeated line for use below
          video = document.querySelector('video');
          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
@@ -1513,7 +1516,7 @@ else{
 
          // Post Request
          var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"TEXT_DETECTION","maxResults":5}]    } ]});
-         var e=new XMLHttpRequest; 
+         var e=new XMLHttpRequest;
          e.onload=function(){
             document.getElementById("restartButton").src = "restart.png";
             canRestart = true;
@@ -1564,7 +1567,7 @@ else{
             var prevCoords;
             var wordList = [];
             
-            fullDatabase = parse_tsv();
+            
             
             var fullText = response["responses"][0]["textAnnotations"][0]["description"].split('\n'); // First item is the full text separated by \n's, so this allows us to parse through and create links for each lines to show on screen
             //document.getElementById("debugText").innerHTML = fullText;
@@ -1583,6 +1586,11 @@ else{
 
             // Check if i should start as be 1 or 0
             for (let i = 0; i < textAndCoords.length; i++) {
+
+               shapeCoords = [];
+               shapeXCoords = [];
+               shapeYCoords = [];
+
                const fuse = new Fuse(Object.keys(fullDatabase), options);
           
                const result = fuse.search("'" + textAndCoords[i]);
@@ -1625,7 +1633,8 @@ else{
                shapeCoords.push(shapeXCoords);
                shapeCoords.push(shapeYCoords);
                shapes.push(shapeCoords);
-
+               var d2 = new Date();
+               console.log("Done: " + d2.toUTCString());
             }
          }
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
@@ -1669,6 +1678,7 @@ canvas.addEventListener("click", (event) => {
    for (let i = 0; i<shapes.length; i++) {
       pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0], shapes[i][1]);
       if (pointIn == true) {
+         console.log("Pointin: " + i);
          window.open(shapeLinks[i], '_blank');
       }
    }

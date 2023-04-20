@@ -1641,13 +1641,41 @@ To populate thin air.”
                const result = fuse.search("'" + textAndCoords[i][0]);
                if (result[0] != undefined) { // If found a link
                   shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence
-               }
-               else {
-                  shapeLinks.push("No link found");
+                  ctx.beginPath();
+                  for (j = 0; j < 4; j++) {
+                     coords = textAndCoords[i][1][j];
+                     if (j == 0) {
+                        ctx.moveTo(coords[0], coords[1]);
+                        originalCoords = coords;
+                     }
+                     else if (j == 1) {
+                        coords = textAndCoords[i][1][2];
+                        ctx.lineTo(coords[0], coords[1]);
+                        ctx.moveTo(coords[0], coords[1]);
+                        //ctx.moveTo(coords[0], coords[1]);
+                     }
+                     else if (j == 2) {
+                        coords = textAndCoords[i][1][3];
+                        ctx.lineTo(coords[0], coords[1]);
+                        //ctx.moveTo(coords[0], coords[1]);
+                     }
+                     else {
+                        coords = textAndCoords[i][1][1]
+                        //ctx.moveTo(prevCoords);
+                        ctx.lineTo(coords[0], coords[1]);
+                     }
+                     shapeXCoords.push(coords[0]);
+                     shapeYCoords.push(coords[1]);
+                  }
+                  ctx.lineTo(originalCoords[0], originalCoords[1]);
+                  ctx.strokeStyle = "red";
+                  ctx.stroke();
+                  shapeCoords.push(shapeXCoords);
+                  shapeCoords.push(shapeYCoords);
+                  shapes.push(shapeCoords);
                }
 
-               var d2 = new Date().getTime();
-
+               /*
                ctx.beginPath();
                for (j = 0; j < 4; j++) {
                   coords = textAndCoords[i][1][j];
@@ -1680,6 +1708,8 @@ To populate thin air.”
                shapeCoords.push(shapeXCoords);
                shapeCoords.push(shapeYCoords);
                shapes.push(shapeCoords);
+            }
+            */
             }
          }
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case

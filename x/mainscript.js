@@ -4,7 +4,6 @@ var video = document.getElementById('video');
 var mediaDevices = navigator.mediaDevices;
 video.muted = true;
 var canRestart = false;
-var textAndCoords = [];
 // Accessing the user camera and video.
 
 window.mobileCheck = function() {
@@ -1488,7 +1487,6 @@ To populate thin air.”
 1304	NIGHTS	FROST-STARS LIKE THE SKY THE SUBLIME DARKNESS OF STORM NIGHTS WHEN ALL THE LIGHTS ARE OUT THE CLOUDS IN WHOSE	Muir, John	“...while the meadows at their feet sparkle with frost-stars like the sky; the sublime darkness of storm-nights, when all the lights are out; the clouds whose depths the frail snow-flowers grow; the behavior and many voices of the different kind of storms, trees, birds, waterfalls, and snow avalanches in the ever-changing weather.”	Muir, John. The Writings of John Muir: Sierra Edition. Vol. II. The Mountains of California. Boston and New York: Houghton Mifflin Company, 1917, 169.	https://archive.org/details/writingsjohnmuir04muirrich/page/n9/mode/2up	https://kahnop.ucsd.edu/bibliography/spine-index/nights_097.html
 1305	NIGHTS	SUMMER'S TROPICAL SUN THE BLUE SKY THE APPROACHING NIGHTS AND THE MORNINGS THE SUN THE STARS THE GRASS	Ritter, William Emerson	“The bit of earth upon which I press my feet here and now and the larger earth that yields me food and drink , this ocean with its relentless power when goaded by winter storms, and with its heavenly peace and calm in its middle stretches under the summer's tropical sun, the blue sky, the approaching night , and the night and the morning, the sun, the stars, the milky way, the grass, the trees, my animal companions, the wild birds, the barn-yard fowls, my dogs, the cattle, the horse, and above all my human friends , my colleagues in work, and my family -- all these have for me a reality that no disorder or dimness of mind (unless indeed , these go to the point of swoon or delirium) or no speculative sophistication can strip them of.”	Ritter, William Emerson. The Probable Infinity of Nature and Life; Three Essays. Boston: R.G. Badger, 1918. p. 131.	https://babel.hathitrust.org/cgi/pt?id=uc1.31822008697948&view=1up&seq=7	https://kahnop.ucsd.edu/bibliography/spine-index/nights_097.html`
 
-
       var parsedDict = {};
       var ix_end = 0;
       for (var ix=0; ix<s.length; ix=ix_end+1) {
@@ -1505,8 +1503,6 @@ To populate thin air.”
       return parsedDict;
    }
 
-   
-   var fullDatabase = parse_tsv();
 
    document.getElementById("snapshotButton").addEventListener("click", () => {
          canvas = document.getElementById("myCanvas"); // Repeated line for use below
@@ -1514,107 +1510,42 @@ To populate thin air.”
          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
          var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
          video.pause();
-
+         
          filename = text.slice(22); // Removes "data:image..." prefix from the dataUrl
 
          // Post Request
-         var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"TEXT_DETECTION","maxResults":5}]    } ]});
-         var e=new XMLHttpRequest;
+         var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"DOCUMENT_TEXT_DETECTION","maxResults":5}]    } ]});
+         var e=new XMLHttpRequest; 
          e.onload=function(){
             document.getElementById("restartButton").src = "restart.png";
             canRestart = true;
             console.log(e.responseText);
             response = JSON.parse(e.responseText);
-            var vertices = [];
-            var line;
-            var coordX1;
-            var coordX2;
-            var coordY1;
-            var coordY2;
-            pages = response["responses"][0]["fullTextAnnotation"]["pages"];
-            for (let i = 0; i < pages.length; i++) {
+            var textAndCoords = [];
+            var text = {};
+            var vertices;
+            for (let i = 0; i < response["responses"][0]["textAnnotations"].length; i++) {
+               // Looping through each word and its coordinates
                
-               blocks = pages[i]["blocks"];
-               for (let j = 0; j < blocks.length; j++){
-
-                  paragraphs = blocks[j]["paragraphs"];
-                  for (let l = 0; l < pages[i]["blocks"][j]["paragraphs"].length; l++) {
-
-                     line = "";
-                     words =  paragraphs[l]["words"];
-                     for (let k = 0; k < words.length; k++) {
-                        symbols = pages[i]["blocks"][j]["paragraphs"][l]["words"][k]["symbols"];
-                        if (line == "") {
-                           coordX1 = symbols[0]["boundingBox"]["vertices"][0]["x"];
-                           if (coordX1 == undefined) {
-                              coordX1 = 0;
-                           }
-                           coordX2 = symbols[0]["boundingBox"]["vertices"][3]["x"];
-                           if (coordX2 == undefined) {
-                              coordX2 = 0;
-                           }
-                           coordY1 = symbols[0]["boundingBox"]["vertices"][0]["y"];
-                           if (coordY1 == undefined) {
-                              coordY1 = 0;
-                           }
-                           coordY2 = symbols[0]["boundingBox"]["vertices"][3]["y"];
-                           if (coordY2 == undefined) {
-                              coordY2 = 0;
-                           }
-                          console.log([coordX1, coordY1]); // Top left coord 
-                          console.log([coordX2, coordY2]);
-                           vertices.push([coordX1, coordY1]); // Top left coord 
-                           vertices.push([coordX2, coordY2]); // Bottom left coord 
-                        }
-                        for (let p = 0; p < symbols.length; p++) {
-
-                           line += symbols[p]["text"];
-                           if (["property"] in symbols[p]){
-                              if (["detectedBreak"] in symbols[p]["property"]) {
-                                 if (symbols[p]["property"]["detectedBreak"]["type"] == "SPACE") {
-                                    line += ' ';
-                                 }
-                                 if (symbols[p]["property"]["detectedBreak"]["type"] == "LINE_BREAK" || symbols[p]["property"]["detectedBreak"]["type"] == "EOL_SURE_SPACE") {
-
-                                    coordX1 = symbols[p]["boundingBox"]["vertices"][1]["x"];
-                                    if (coordX1 < 0) {
-                                       coordX1 = 0;
-                                    }
-                                    coordX2 = symbols[p]["boundingBox"]["vertices"][2]["x"];
-                                    if (coordX2 < 0) {
-                                       coordX2 = 0;
-                                    }
-                                    coordY1 = symbols[p]["boundingBox"]["vertices"][1]["y"];
-                                    if (coordY1 < 0) {
-                                       coordY1 = 0;
-                                    }
-                                    coordY2 = symbols[p]["boundingBox"]["vertices"][2]["y"];
-                                    if (coordY2 < 0) {
-                                       coordY2 = 0;
-                                    }
-
-                                    vertices.push([coordX1, coordY1]); // Top right coord 
-                                    vertices.push([coordX2, coordY2]); // Bottom right coord 
-
-                                    textAndCoords.push([line, vertices]);
-                                    line = "";
-                                    vertices = [];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
+               vertices = [];
+               text["description"] = response["responses"][0]["textAnnotations"][i]["description"]//.replace('[^A-Za-z0-9]', ''); // Removes Special characters
+               
+               
+               for (index in response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"]) {
+                  vertices.push([response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["x"], response["responses"][0]["textAnnotations"][i]["boundingPoly"]["vertices"][index]["y"]]);
                }
+               textAndCoords.push([text["description"], vertices]);
             }
 
             var coords;
 
             var originalCoords;
+            var prevCoords;
+            var wordList = [];
             
+            fullDatabase = parse_tsv();
             
-            
-            //var fullText = response["responses"][0]["textAnnotations"][0]["description"].split('\n'); // First item is the full text separated by \n's, so this allows us to parse through and create links for each lines to show on screen
+            var fullText = textAndCoords[0][0].split('\n'); // First item is the full text separated by \n's, so this allows us to parse through and create links for each lines to show on screen
             //document.getElementById("debugText").innerHTML = fullText;
             const options = {
 
@@ -1627,64 +1558,131 @@ To populate thin air.”
             var shapeCoords = [];
             var shapeXCoords = [];
             var shapeYCoords = [];
+            var loopNum = 1; // Used as a parallel to i for looping over a list of each word rather than each line
 
-            // Check if i should start as be 1 or 0
-            for (let i = 0; i < textAndCoords.length; i++) {
-
+            // Check if i should start as be 1 or 0            
+            for (var i = 0; i < fullText.length; i++) { // +1 to fulltext.length to account for fulltext in textandcoords? (check later)
+               wordList = [];
                shapeCoords = [];
                shapeXCoords = [];
                shapeYCoords = [];
 
-               const fuse = new Fuse(Object.keys(fullDatabase), options);
+               wordListTemp = fullText[i].split(" "); // Splits into words
+               for (let l = 0; l<wordListTemp.length; l++) {
+                  // Add cases for "//" and time (00:00:00)
+                  tempList = wordListTemp[l].split(/([^0-9a-zA-Z.,'])/g); // Putting the delimiter in "/()/g" Splits on Special Characters while keeping them to avoid indexing issues with google results
+                  console.log("Templist: " + tempList);
+                  for (let k = 0; k<tempList.length; k++){
+                     if (tempList[k] != ''){
+                        console.log("Tempitem: " + tempList[k]); // Covers case where special characters are at the beginning or end, because the split creates an empty item when that occurs
+                        wordList.push(tempList[k])
+                     }
+                  }
+               }
+               //wordList = fullText[i].split(/([^A-Za-z])/g); // Splits each line into a list of words
+               console.log("Wordlist: " + wordList);
                
+               /*
+               for (let c = 0; c<(Object.keys(fullDatabase)).length; c++){ 
+                  console.log("looping");
+                  const distance = levenshtein(fullText[i], Object.keys(fullDatabase)[c]);
+                  //console.log("Fultext[i]: " + fullText[i] + "\nObject.keys...: " + Object.keys(fullDatabase)[c]);
+                  if (distance <= 500) {
+                     shapeLinks.push(fullDatabase[Object.keys(fullDatabase)[c]]); // Gets link corresponding to the sentence
+                     console.log("What google found: "+ fullText[i] + "\nOriginal: " + Object.keys(fullDatabase)[c]);
+                  }
+                  else{
+                     shapeLinks.push("No link found")
+                     console.log("no link found");
+                  }
+               }*/
+               
+               //const distance = levenshtein(fullText[i], searchText);
 
-               const result = fuse.search("'" + textAndCoords[i][0]);
+               const fuse = new Fuse(Object.keys(fullDatabase), options);
+          
+               const result = fuse.search("'" + fullText[i]);
                if (result[0] != undefined) { // If found a link
                   shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence
+                  console.log("Google: "+ fullText[i] + "\nOriginal: " + result[0]["item"] + "\nIndex: " + fullDatabase[result[0]["item"]]["index"]);
                }
                else {
                   shapeLinks.push("No link found");
                }
 
-               var d2 = new Date().getTime();
-
                ctx.beginPath();
-               for (j = 0; j < 4; j++) {
-                  coords = textAndCoords[i][1][j];
-                  if (j == 0) {
-                     ctx.moveTo(coords[0], coords[1]);
-                     originalCoords = coords;
+               if (wordList.length == 1) {
+                  for (let j = 0; j < 4; j++) {
+                     /*textAndCoords[wordList][j] = textAndCoords[wordList][j].replace('(', ''); // Gets and reformats coordinates // Replace with i + 1 instead of wordlist for indexing to avoid repitition errors
+                     textAndCoords[wordList][j] = textAndCoords[wordList][j].replace(')', '');*/
+                     coords = textAndCoords[loopNum][1][j]; //textAndCoords[wordList][j].split(',');
+                     shapeXCoords.push(coords[0]);
+                     shapeYCoords.push(coords[1]);
+                     if (j == 0) {
+                        ctx.moveTo(coords[0], coords[1]);
+                        originalCoords = coords;
+                     }
+                     else {
+                        ctx.lineTo(coords[0], coords[1]);
+                     }
                   }
-                  else if (j == 1) {
-                     coords = textAndCoords[i][1][2];
-                     ctx.lineTo(coords[0], coords[1]);
-                     ctx.moveTo(coords[0], coords[1]);
-                     //ctx.moveTo(coords[0], coords[1]);
-                  }
-                  else if (j == 2) {
-                     coords = textAndCoords[i][1][3];
-                     ctx.lineTo(coords[0], coords[1]);
-                     //ctx.moveTo(coords[0], coords[1]);
-                  }
-                  else {
-                     coords = textAndCoords[i][1][1]
-                     //ctx.moveTo(prevCoords);
-                     ctx.lineTo(coords[0], coords[1]);
-                  }
-                  shapeXCoords.push(coords[0]);
-                  shapeYCoords.push(coords[1]);
+                  // Drawing last line to first point
+                  ctx.lineTo(originalCoords[0], originalCoords[1]);
+                  ctx.strokeStyle = "red";
+                  ctx.stroke();
                }
-               ctx.lineTo(originalCoords[0], originalCoords[1]);
-               ctx.strokeStyle = "red";
-               ctx.stroke();
+               else {
+                  // For lines with more than 1 word, uses coordinates of first and last word in line
+                  for (let b = 0; b < 4; b++) {
+                     coords = textAndCoords[loopNum][1][b];
+                     if (b == 0) {
+                        ctx.moveTo(coords[0], coords[1]);
+                        originalCoords = coords;
+                        prevCoords = coords;
+                     }
+                     else if ((b == 1) || (b == 2)) {
+                        // Draws to the last word in the sentence (necessary for multi-word lines)
+                        coords = textAndCoords[loopNum + wordList.length - 1][1][b];
+                        ctx.moveTo(prevCoords[0], prevCoords[1]);
+                        ctx.lineTo(coords[0], coords[1]);
+                        prevCoords = coords;
+                     }
+                     else {
+                        ctx.moveTo(prevCoords[0], prevCoords[1]);
+                        ctx.lineTo(coords[0], coords[1]);
+                        prevCoords = coords;
+                        
+                     }
+                     shapeXCoords.push(coords[0]);
+                     shapeYCoords.push(coords[1]);
+                  }
+                  ctx.moveTo(prevCoords[0], prevCoords[1]);
+                  ctx.lineTo(originalCoords[0], originalCoords[1]);
+                  ctx.strokeStyle = "red";
+                  ctx.stroke();
+               }
+               loopNum += wordList.length;
                shapeCoords.push(shapeXCoords);
                shapeCoords.push(shapeYCoords);
                shapes.push(shapeCoords);
+               }
+               /*for (var k = 0; k <result.length; k++){
+                  console.log(
+                        "Original: " + fullText[i] +
+                        "\nResult: " +
+                        result[k]["item"] 
+                        + "\nRating: "
+                        + result[k]["score"]
+                     );
+                  shapeLink = (fullDatabase[result[0]["item"]]);  
+               }*/
+               //document.getElem
             }
-         }
+         
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
          e.send(b);
-   });
+      }
+      );
 
 function checkcheck (x, y, cornersX, cornersY) {
 
@@ -1717,14 +1715,13 @@ document.getElementById("restartButton").addEventListener("click", () => {
       shapes = []; // Resetting Links;
    }
 }
-);
+)
 
 canvas.addEventListener("click", (event) => {
    for (let i = 0; i<shapes.length; i++) {
       pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0], shapes[i][1]);
       if (pointIn == true) {
          window.open(shapeLinks[i], '_blank');
-         //console.log("Text: " + textAndCoords[i][0]);
       }
    }
 });

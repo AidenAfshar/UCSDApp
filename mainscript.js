@@ -4,6 +4,7 @@ var video = document.getElementById('video');
 var mediaDevices = navigator.mediaDevices;
 video.muted = true;
 var canRestart = false;
+var canSnapshot = true;
 var textAndCoords = [];
 // Accessing the user camera and video.
 
@@ -1489,26 +1490,30 @@ To populate thin air.”
 1305	NIGHTS	SUMMER'S TROPICAL SUN THE BLUE SKY THE APPROACHING NIGHTS AND THE MORNINGS THE SUN THE STARS THE GRASS	Ritter, William Emerson	“The bit of earth upon which I press my feet here and now and the larger earth that yields me food and drink , this ocean with its relentless power when goaded by winter storms, and with its heavenly peace and calm in its middle stretches under the summer's tropical sun, the blue sky, the approaching night , and the night and the morning, the sun, the stars, the milky way, the grass, the trees, my animal companions, the wild birds, the barn-yard fowls, my dogs, the cattle, the horse, and above all my human friends , my colleagues in work, and my family -- all these have for me a reality that no disorder or dimness of mind (unless indeed , these go to the point of swoon or delirium) or no speculative sophistication can strip them of.”	Ritter, William Emerson. The Probable Infinity of Nature and Life; Three Essays. Boston: R.G. Badger, 1918. p. 131.	https://babel.hathitrust.org/cgi/pt?id=uc1.31822008697948&view=1up&seq=7	https://kahnop.ucsd.edu/bibliography/spine-index/nights_097.html`
 
 
-      var parsedDict = {};
-      var ix_end = 0;
-      for (var ix=0; ix<s.length; ix=ix_end+1) {
-         ix_end = s.indexOf('\n', ix);
-         if (ix_end == -1) {
-            ix_end = s.length;
-         }
-         var row = s.substring(ix, ix_end).split('\t');
-         parsedDict[row[2]] = {
-            "index" : row[0],
-            "link" : row[7]
-         }
+   var parsedDict = {};
+   var ix_end = 0;
+   for (var ix=0; ix<s.length; ix=ix_end+1) {
+      ix_end = s.indexOf('\n', ix);
+      if (ix_end == -1) {
+         ix_end = s.length;
       }
-      return parsedDict;
+      var row = s.substring(ix, ix_end).split('\t');
+      parsedDict[row[2]] = {
+         "index" : row[0],
+         "link" : row[7]
+      }
+   }
+   return parsedDict;
    }
 
    
    var fullDatabase = parse_tsv();
 
    document.getElementById("snapshotButton").addEventListener("click", () => {
+      if (canSnapshot == true) {
+         console.log("snapshotting");
+         textAndCoords = [];
+         canSnapshot = false;
          canvas = document.getElementById("myCanvas"); // Repeated line for use below
          video = document.querySelector('video');
          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
@@ -1561,10 +1566,10 @@ To populate thin air.”
                            if (coordY2 == undefined) {
                               coordY2 = 0;
                            }
-                          console.log([coordX1, coordY1]); // Top left coord 
-                          console.log([coordX2, coordY2]);
+                        /*console.log([coordX1, coordY1]); // Top left coord 
+                        console.log([coordX2, coordY2]);*/
                            vertices.push([coordX1, coordY1]); // Top left coord 
-                           vertices.push([coordX2, coordY2]); // Bottom left coord 
+                           vertices.push([coordX2, coordY2]); // Bottom left coord
                         }
                         for (let p = 0; p < symbols.length; p++) {
 
@@ -1622,14 +1627,16 @@ To populate thin air.”
                tokenize: false, // Debug measure (tokenize causes each word to be separate)
                ignoreLocation: true, // Debug measure (we don't care about where in the database the text is, so location doesn't matter)
                threshold: 0.3 // High threshold = good results
-             }
+            }
 
             var shapeCoords = [];
             var shapeXCoords = [];
             var shapeYCoords = [];
 
             // Check if i should start as be 1 or 0
+            console.log("Should loop: " + textAndCoords.length);
             for (let i = 0; i < textAndCoords.length; i++) {
+
 
                shapeCoords = [];
                shapeXCoords = [];
@@ -1640,7 +1647,11 @@ To populate thin air.”
 
                const result = fuse.search("'" + textAndCoords[i][0]);
                if (result[0] != undefined) { // If found a link
-                  shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence
+                  /*console.log('\n')
+                  console.log(result[0]["item"]);
+                  console.log(fullDatabase[result[0]["item"]]["link"]);
+                  console.log(fullDatabase[result[0]["item"]]);*/
+                  shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence*/
                   ctx.beginPath();
                   for (j = 0; j < 4; j++) {
                      coords = textAndCoords[i][1][j];
@@ -1675,9 +1686,11 @@ To populate thin air.”
                   shapes.push(shapeCoords);
                }
             }
+            console.log(shapeLinks);
          }
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
          e.send(b);
+      }
    });
 
 function checkcheck (x, y, cornersX, cornersY) {
@@ -1708,6 +1721,7 @@ document.getElementById("restartButton").addEventListener("click", () => {
       video.play();
       document.getElementById("restartButton").src = "restarthalf.png";
       canRestart = false;
+      canSnapshot = true;
       shapes = []; // Resetting Links;
    }
 }

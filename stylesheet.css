@@ -29,3 +29,8 @@ video {
 #header{
     margin-top: 34vw;
 }
+#field {
+    font-family: 'Lora', serif;
+    font-weight: 200;
+    font-size: 2vw;
+}

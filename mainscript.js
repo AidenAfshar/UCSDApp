@@ -27,11 +27,13 @@ if (window.mobileCheck() == true){
    video.srcObject = stream;
    video.addEventListener("loadedmetadata", () => {
          video.play();
+         console.log("playing");
    });
    })
    .catch(alert);
 }
 else{
+   console.log("computer");
    mediaDevices.getUserMedia(
       {
          video: true, // Use this for computer and below for phone
@@ -45,6 +47,7 @@ else{
    video.srcObject = stream;
    video.addEventListener("loadedmetadata", () => {
          video.play();
+        console.log("playing");
    });
    })
    .catch(alert);
@@ -67,6 +70,7 @@ else{
      
      video.addEventListener('play', function () {
          var $this = this; //cache
+         console.log("playing");
          (function loop() {
              if (!$this.paused && !$this.ended) {
                  ctx.drawImage($this, 0, 0, canvas.width, canvas.height);

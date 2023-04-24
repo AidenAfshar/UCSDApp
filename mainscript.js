@@ -70,117 +70,11 @@ else{
          (function loop() {
              if (!$this.paused && !$this.ended) {
                  ctx.drawImage($this, 0, 0, canvas.width, canvas.height);
-                 setTimeout(loop, 1000 / 30); // drawing at 30fps
+                 setTimeout(loop, 1000 / 60); // drawing at 60fps
              }
          })();
      }, 0);
 
-// Search Algo stuff //
-  function _min(d0, d1, d2, bx, ay)
-  {
-    return d0 < d1 || d2 < d1
-        ? d0 > d2
-            ? d2 + 1
-            : d0 + 1
-        : bx === ay
-            ? d1
-            : d1 + 1;
-  }
-
-  function levenshtein(a, b)
-  {
-   a = a.toLowerCase();
-   b = b.toLowerCase();
-    if (a === b) {
-      return 0;
-    }
-
-    if (a.length > b.length) {
-      var tmp = a;
-      a = b;
-      b = tmp;
-    }
-
-    var la = a.length;
-    var lb = b.length;
-
-    while (la > 0 && (a.charCodeAt(la - 1) === b.charCodeAt(lb - 1))) {
-      la--;
-      lb--;
-    }
-
-    var offset = 0;
-
-    while (offset < la && (a.charCodeAt(offset) === b.charCodeAt(offset))) {
-      offset++;
-    }
-
-    la -= offset;
-    lb -= offset;
-
-    if (la === 0 || lb < 3) {
-      return lb;
-    }
-
-    var x = 0;
-    var y;
-    var d0;
-    var d1;
-    var d2;
-    var d3;
-    var dd;
-    var dy;
-    var ay;
-    var bx0;
-    var bx1;
-    var bx2;
-    var bx3;
-
-    var vector = [];
-
-    for (y = 0; y < la; y++) {
-      vector.push(y + 1);
-      vector.push(a.charCodeAt(offset + y));
-    }
-
-    var len = vector.length - 1;
-
-    for (; x < lb - 3;) {
-      bx0 = b.charCodeAt(offset + (d0 = x));
-      bx1 = b.charCodeAt(offset + (d1 = x + 1));
-      bx2 = b.charCodeAt(offset + (d2 = x + 2));
-      bx3 = b.charCodeAt(offset + (d3 = x + 3));
-      dd = (x += 4);
-      for (y = 0; y < len; y += 2) {
-        dy = vector[y];
-        ay = vector[y + 1];
-        d0 = _min(dy, d0, d1, bx0, ay);
-        d1 = _min(d0, d1, d2, bx1, ay);
-        d2 = _min(d1, d2, d3, bx2, ay);
-        dd = _min(d2, d3, dd, bx3, ay);
-        vector[y] = dd;
-        d3 = d2;
-        d2 = d1;
-        d1 = d0;
-        d0 = dy;
-      }
-    }
-
-    for (; x < lb;) {
-      bx0 = b.charCodeAt(offset + (d0 = x));
-      dd = ++x;
-      for (y = 0; y < len; y += 2) {
-        dy = vector[y];
-        vector[y] = dd = _min(dy, d0, dd, bx0, vector[y + 1]);
-        d0 = dy;
-      }
-    }
-
-    return dd;
-  };
-// Search algo stuff end // 
-
-   // parse_tsv(tsvstring, function (row) { do something with row })  
    function parse_tsv() {
 
       s =`1	STEP	UNDERSTOOD IS A STEP TOWARD BEING HEALED UNDERSTANDING IS A STEP TOWARD BUILDING COMMUNITY I AM TRYING TO FACILITATE INWARD EXPERIENCE BECAUSE PEOPLE	Oliveros, Pauline	“I began to understand that many people felt that they were not being heard (something especially true today, both locally and globally). I recognized that being heard is a step toward being understood. Being understood is a step toward being healed. Understanding is a step toward building community.”	Oliveros, Pauline. "My "American Music": Soundscape, Politics, Technology, Community." American Music 25, no. 4 (Winter, 2007): 393. doi:10.2307/40071676.	https://www.jstor.org/stable/40071676?seq=1  https://www.press.uillinois.edu/journals/am.html  	https://search-library.ucsd.edu/permalink/01UCS_SDI/1vtf07t/cdi_proquest_journals_1374683	https://kahnop.ucsd.edu/bibliography/spine-index/step_000.html
@@ -1565,8 +1459,6 @@ else{
                            if (coordY2 == undefined) {
                               coordY2 = 0;
                            }
-                        /*console.log([coordX1, coordY1]); // Top left coord 
-                        console.log([coordX2, coordY2]);*/
                            vertices.push([coordX1, coordY1]); // Top left coord 
                            vertices.push([coordX2, coordY2]); // Bottom left coord
                         }
@@ -1578,6 +1470,7 @@ else{
                                  if (symbols[p]["property"]["detectedBreak"]["type"] == "SPACE") {
                                     line += ' ';
                                  }
+                                 // If line ends
                                  if (symbols[p]["property"]["detectedBreak"]["type"] == "LINE_BREAK" || symbols[p]["property"]["detectedBreak"]["type"] == "EOL_SURE_SPACE") {
 
                                     coordX1 = symbols[p]["boundingBox"]["vertices"][1]["x"];
@@ -1613,13 +1506,8 @@ else{
             }
 
             var coords;
-
             var originalCoords;
             
-            
-            
-            //var fullText = response["responses"][0]["textAnnotations"][0]["description"].split('\n'); // First item is the full text separated by \n's, so this allows us to parse through and create links for each lines to show on screen
-            //document.getElementById("debugText").innerHTML = fullText;
             const options = {
 
                includeScore: true, // Rating allows for options to be shown from lowest to highest score
@@ -1631,17 +1519,13 @@ else{
             var shapeCoords = [];
             var shapeXCoords = [];
             var shapeYCoords = [];
+            
+            const fuse = new Fuse(Object.keys(fullDatabase), options);
 
-            // Check if i should start as be 1 or 0
             for (let i = 0; i < textAndCoords.length; i++) {
-
-
                shapeCoords = [];
                shapeXCoords = [];
                shapeYCoords = [];
-
-               const fuse = new Fuse(Object.keys(fullDatabase), options);
-               
 
                const result = fuse.search("'" + textAndCoords[i][0]);
                if (result[0] != undefined) { // If found a link

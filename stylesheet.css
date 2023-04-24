@@ -29,3 +29,7 @@ video {
 #header{
     margin-top: 34vw;
 }
+#field {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 4vw;
+}

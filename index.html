@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@200&display=swap" rel="stylesheet">  
   <link rel="stylesheet" href="stylesheet.css">
 </head>
 <html>
   <body onload="init();">
     <img  id = "ucsdLogo" width = 500vw src= "ucsd-logo.jpg">
     <img  id = "kahnop" width = 500vw src= "kahnop.png">
-    
+    <h1 id = "field">A Field For Finding</h1>
     <br/>
     <video hidden = hidden onclick="snapshot(this);" id="video" autoplay playsinline></video>
-    <canvas width = 800 height = 1100 id="myCanvas">
-    </canvas>
+    <canvas width = 800 height = 1100 id="myCanvas"></canvas>
     <br/>
     <img src = "button.png" id = "snapshotButton">
     <!--<h1 id = "header">Debug Stuff</h1>

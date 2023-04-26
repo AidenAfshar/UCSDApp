@@ -1609,6 +1609,7 @@ document.getElementById("restartButton").addEventListener("click", () => {
 
 document.getElementById("cameraButton").addEventListener("click", () => {
    if (canRestart == false) {
+      video.pause()
       if (facing = "user") {
          facing = "environment";
          mediaDevices.getUserMedia(
@@ -1627,6 +1628,7 @@ document.getElementById("cameraButton").addEventListener("click", () => {
             }
          )
       }
+      video.play()
       canRestart = false;
       canSnapshot = true;
       shapes = []; // Resetting Links;

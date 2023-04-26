@@ -1436,6 +1436,7 @@ else{
                document.getElementById("cameraButton").style.opacity = "1";
                document.getElementById("snapshotButton").style.opacity= "1";
                document.getElementById("loadingRing").style.opacity = "0";
+               video.play;
                return;
             }
             var vertices = [];

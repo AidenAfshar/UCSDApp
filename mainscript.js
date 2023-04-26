@@ -1610,8 +1610,8 @@ document.getElementById("restartButton").addEventListener("click", () => {
 document.getElementById("cameraButton").addEventListener("click", () => {
    if (canRestart == false) {
       video.srcObject.getTracks().forEach(t => t.stop());
-      if (facing = "user") {
-         facing = "environment";
+      if (facing = "environment") {
+         facing = "user";
          mediaDevices.getUserMedia(
             {
                video: { facingMode: { exact: "user" } },
@@ -1629,7 +1629,7 @@ document.getElementById("cameraButton").addEventListener("click", () => {
             .catch(alert);
       }
       else {
-         facing = "user";
+         facing = "environment";
          mediaDevices.getUserMedia(
             {
                video: { facingMode: { exact: "environment" } },

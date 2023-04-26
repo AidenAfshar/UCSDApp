@@ -1618,6 +1618,15 @@ document.getElementById("cameraButton").addEventListener("click", () => {
                audio: false
             }
          )
+         .then((stream) => {
+
+            // Changing the source of video to current stream.
+            video.srcObject = stream;
+            video.addEventListener("loadedmetadata", () => {
+                  video.play();
+            });
+            })
+            .catch(alert);
       }
       else {
          facing = "user";
@@ -1627,8 +1636,16 @@ document.getElementById("cameraButton").addEventListener("click", () => {
                audio: false
             }
          )
+         .then((stream) => {
+
+            // Changing the source of video to current stream.
+            video.srcObject = stream;
+            video.addEventListener("loadedmetadata", () => {
+                  video.play();
+            });
+            })
+            .catch(alert);
       }
-      video.play()
       canRestart = false;
       canSnapshot = true;
       shapes = []; // Resetting Links;

@@ -5,14 +5,6 @@ body {
     margin-bottom: -5vw;
 }
 
-#roundedCorners{
-    position: absolute;
-    margin-top: 15vw;
-    margin-left: 5.3vw;
-    width: 42vw;
-    height: 122vh;
-}
-
 #d0 {
     position: absolute;
     display:flex;

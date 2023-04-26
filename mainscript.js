@@ -1608,6 +1608,7 @@ document.getElementById("restartButton").addEventListener("click", () => {
 
 document.getElementById("cameraButton").addEventListener("click", () => {
    if (canRestart == false) {
+      alert("Switching\nCurrently Facing: " + facing)
       video.srcObject.getTracks().forEach(t => t.stop());
       if (facing = "environment") {
          alert("usering");

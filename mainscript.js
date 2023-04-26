@@ -1597,7 +1597,6 @@ canvas = document.getElementById("myCanvas"); // Repeated line for use below
 
 document.getElementById("restartButton").addEventListener("click", () => {
    if (canRestart) {
-      video.srcObject.stop();
       document.getElementById("restartButton").style.opacity = "0.3";
       document.getElementById("cameraButton").style.opacity = "1";
       canRestart = false;
@@ -1608,6 +1607,7 @@ document.getElementById("restartButton").addEventListener("click", () => {
 );
 
 document.getElementById("cameraButton").addEventListener("click", () => {
+   alert(facing);
    if (canRestart == false) {
       video.srcObject.getTracks().forEach(t => t.stop());
       if (facing = "environment") {

@@ -1610,7 +1610,7 @@ document.getElementById("cameraButton").addEventListener("click", () => {
    if (canRestart == false) {
       video.srcObject.getTracks().forEach(t => t.stop());
       if (facing = "environment") {
-         alert("environmenting");
+         alert("usering");
          facing = "user";
          mediaDevices.getUserMedia(
             {

@@ -1431,7 +1431,6 @@ else{
             canRestart = true;
             //console.log(e.responseText);
             response = JSON.parse(e.responseText);
-            console.log(response);
             if (response["responses"][0]["fullTextAnnotation"] == undefined) {
                document.getElementById("restartButton").style.opacity = "0.3";
                document.getElementById("cameraButton").style.opacity = "1";

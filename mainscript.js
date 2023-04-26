@@ -1607,7 +1607,6 @@ document.getElementById("restartButton").addEventListener("click", () => {
 );
 
 document.getElementById("cameraButton").addEventListener("click", () => {
-   alert(facing);
    if (canRestart == false) {
       video.srcObject.getTracks().forEach(t => t.stop());
       if (facing = "environment") {
@@ -1629,6 +1628,7 @@ document.getElementById("cameraButton").addEventListener("click", () => {
             .catch(alert);
       }
       else {
+         alert("environmenting");
          facing = "environment";
          mediaDevices.getUserMedia(
             {

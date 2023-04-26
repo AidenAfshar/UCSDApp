@@ -33,10 +33,9 @@ if (window.mobileCheck() == true){
    .catch(alert);
 }
 else{
-   /*
    document.body.style.fontSize = "3vw";
    document.body.innerHTML = "Sorry! This website is only available on mobile";
-   */
+   /*
    mediaDevices.getUserMedia(
       {
          video: true, // Use this for computer and below for phone
@@ -53,6 +52,7 @@ else{
    });
    })
    .catch(alert);
+   */
 }
 
       var canvas, ctx;
@@ -1431,6 +1431,14 @@ else{
             canRestart = true;
             //console.log(e.responseText);
             response = JSON.parse(e.responseText);
+            console.log(response);
+            if (response["responses"][0]["fullTextAnnotation"] == undefined) {
+               document.getElementById("restartButton").style.opacity = "0.3";
+               document.getElementById("cameraButton").style.opacity = "1";
+               document.getElementById("snapshotButton").style.opacity= "1";
+               document.getElementById("loadingRing").style.opacity = "0";
+               return;
+            }
             var vertices = [];
             var line;
             var coordX1;

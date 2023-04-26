@@ -18,6 +18,7 @@ video {
 }
 #restartButton {
     width: 10vw;
+    opacity: 0.3;
 }
 #d1 {
     margin-top: -10vw;

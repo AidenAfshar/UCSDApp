@@ -1419,7 +1419,7 @@ else{
          var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"TEXT_DETECTION","maxResults":5}]    } ]});
          var e=new XMLHttpRequest;
          e.onload=function(){
-            document.getElementById("restartButton").src = "restart.png";
+            document.getElementById("restartButton").style.opacity = "1";
             canRestart = true;
             //console.log(e.responseText);
             response = JSON.parse(e.responseText);
@@ -1596,7 +1596,7 @@ canvas = document.getElementById("myCanvas"); // Repeated line for use below
 document.getElementById("restartButton").addEventListener("click", () => {
    if (canRestart) {
       video.play();
-      document.getElementById("restartButton").src = "restarthalf.png";
+      document.getElementById("restartButton").style.opacity = "0.3";
       canRestart = false;
       canSnapshot = true;
       shapes = []; // Resetting Links;

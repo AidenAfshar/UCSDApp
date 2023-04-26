@@ -33,9 +33,10 @@ if (window.mobileCheck() == true){
    .catch(alert);
 }
 else{
+   /*
    document.body.style.fontSize = "3vw";
    document.body.innerHTML = "Sorry! This website is only available on mobile";
-   /*
+   */
    mediaDevices.getUserMedia(
       {
          video: true, // Use this for computer and below for phone
@@ -52,7 +53,6 @@ else{
    });
    })
    .catch(alert);
-   */
 }
 
       var canvas, ctx;

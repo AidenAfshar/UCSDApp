@@ -1614,7 +1614,7 @@ document.getElementById("cameraButton").addEventListener("click", () => {
          facing = "environment";
          mediaDevices.getUserMedia(
             {
-               video: { facingMode: { exact: "environment" } },
+               video: { facingMode: { exact: "user" } },
                audio: false
             }
          )
@@ -1632,7 +1632,7 @@ document.getElementById("cameraButton").addEventListener("click", () => {
          facing = "user";
          mediaDevices.getUserMedia(
             {
-               video: { facingMode: { exact: "user" } },
+               video: { facingMode: { exact: "environment" } },
                audio: false
             }
          )

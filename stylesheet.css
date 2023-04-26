@@ -4,6 +4,20 @@ body {
 #ucsdLogo {
     margin-bottom: -5vw;
 }
+
+#d0 {
+    position: absolute;
+    display:flex;
+    justify-content: center;
+    margin-left: 49vw;
+    margin-top: -12vw;
+    z-index: -1;
+}
+
+#loadingRing {
+    opacity: 0;
+    position: absolute;
+}
 #snapshotButton{
     width: 15vw;
     margin-top: 4vh;

@@ -33,9 +33,10 @@ if (window.mobileCheck() == true){
    .catch(alert);
 }
 else{
+   /*
    document.body.style.fontSize = "3vw";
    document.body.innerHTML = "Sorry! This website is only available on mobile";
-   /*
+   */
    mediaDevices.getUserMedia(
       {
          video: true, // Use this for computer and below for phone
@@ -52,7 +53,6 @@ else{
    });
    })
    .catch(alert);
-   */
 }
 
       var canvas, ctx;
@@ -1410,6 +1410,8 @@ else{
 
    document.getElementById("snapshotButton").addEventListener("click", () => {
       if (canSnapshot == true) {
+         document.getElementById("snapshotButton").style.opacity= "0";
+         document.getElementById("loadingRing").style.opacity = "1";
          textAndCoords = [];
          canSnapshot = false;
          canvas = document.getElementById("myCanvas"); // Repeated line for use below
@@ -1570,6 +1572,8 @@ else{
                   shapes.push(shapeCoords);
                }
             }
+            document.getElementById("snapshotButton").style.opacity= "1";
+            document.getElementById("loadingRing").style.opacity = "0";
          }
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
          e.send(b);

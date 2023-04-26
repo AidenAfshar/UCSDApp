@@ -36,8 +36,12 @@ video {
 }
 #cameraButton {
     width: 10vw;
-    margin-right:35vw;
-    margin-top: -50vw;
+}
+#d2{
+    display:flex;
+    justify-content: center;
+    margin-top: -11vw;
+    margin-right: 32vw;
 }
 #d1 {
     margin-top: -10vw;

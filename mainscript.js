@@ -6,6 +6,7 @@ video.muted = true;
 var canRestart = false;
 var canSnapshot = true;
 var textAndCoords = [];
+var facing = "environment";
 // Accessing the user camera and video.
 
 window.mobileCheck = function() {
@@ -1420,6 +1421,7 @@ else{
          var e=new XMLHttpRequest;
          e.onload=function(){
             document.getElementById("restartButton").style.opacity = "1";
+            document.getElementById("cameraButton").style.opacity = "0.3";
             canRestart = true;
             //console.log(e.responseText);
             response = JSON.parse(e.responseText);
@@ -1597,12 +1599,39 @@ document.getElementById("restartButton").addEventListener("click", () => {
    if (canRestart) {
       video.play();
       document.getElementById("restartButton").style.opacity = "0.3";
+      document.getElementById("cameraButton").style.opacity = "1";
       canRestart = false;
       canSnapshot = true;
       shapes = []; // Resetting Links;
    }
 }
 );
+
+document.getElementById("cameraButton").addEventListener("click", () => {
+   if (canRestart == false) {
+      if (facing = "user") {
+         facing = "environment";
+         mediaDevices.getUserMedia(
+            {
+               video: { facingMode: { exact: "environment" } },
+               audio: false
+            }
+         )
+      }
+      else {
+         facing = "user";
+         mediaDevices.getUserMedia(
+            {
+               video: { facingMode: { exact: "user" } },
+               audio: false
+            }
+         )
+      }
+      canRestart = false;
+      canSnapshot = true;
+      shapes = []; // Resetting Links;
+   }
+});
 
 canvas.addEventListener("click", (event) => {
    for (let i = 0; i<shapes.length; i++) {

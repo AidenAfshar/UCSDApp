@@ -20,6 +20,11 @@ video {
     width: 10vw;
     opacity: 0.3;
 }
+#cameraButton {
+    width: 10vw;
+    margin-right:35vw;
+    margin-top: -50vw;
+}
 #d1 {
     margin-top: -10vw;
     margin-left: 30vw;
@@ -33,4 +38,5 @@ video {
 #field {
     font-family: 'Noto Sans JP', sans-serif;
     font-size: 4vw;
+    margin: 2vw;
 }

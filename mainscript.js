@@ -1547,7 +1547,7 @@ else{
 
                const result = fuse.search("'" + textAndCoords[i][0]);
                if (result[0] != undefined) { // If found a link
-                  ctx.lineWidth = 6;
+                  ctx.lineWidth = 8;
                   shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence*/
                   ctx.beginPath();
                   for (j = 0; j < 4; j++) {
@@ -1579,7 +1579,7 @@ else{
                   ctx.strokeStyle = "white"
                   ctx.stroke();
                   ctx.strokeStyle = "#6434eb"; // Makes outline
-                  ctx.lineWidth = 3;
+                  ctx.lineWidth = 4;
                   ctx.stroke();
                   shapeCoords.push(shapeXCoords);
                   shapeCoords.push(shapeYCoords);

@@ -1547,7 +1547,7 @@ else{
 
                const result = fuse.search("'" + textAndCoords[i][0]);
                if (result[0] != undefined) { // If found a link
-                  ctx.lineWidth = 3.5;
+                  ctx.lineWidth = 4.5;
                   shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence*/
                   ctx.beginPath();
                   for (j = 0; j < 4; j++) {
@@ -1577,9 +1577,9 @@ else{
                   }
                   ctx.lineTo(originalCoords[0], originalCoords[1]);
                   ctx.strokeStyle = "white";
-                  ctx.shadowBlur = 4;
-                  ctx.shadowOffsetX = 3;
-                  ctx.shadowOffsetY = 5;
+                  ctx.shadowBlur = 5;
+                  ctx.shadowOffsetX = 2;
+                  ctx.shadowOffsetY = 3;
                   ctx.shadowColor = "black";
                   ctx.stroke();
                   shapeCoords.push(shapeXCoords);

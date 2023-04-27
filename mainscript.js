@@ -33,9 +33,10 @@ if (window.mobileCheck() == true){
    .catch(alert);
 }
 else{
+   /*
    document.body.style.fontSize = "3vw";
    document.body.innerHTML = "Sorry! This website is only available on mobile";
-   /*
+   */
    mediaDevices.getUserMedia(
       {
          video: true, // Use this for computer and below for phone
@@ -52,7 +53,6 @@ else{
    });
    })
    .catch(alert);
-   */
 }
 
       var canvas, ctx;
@@ -1547,6 +1547,7 @@ else{
 
                const result = fuse.search("'" + textAndCoords[i][0]);
                if (result[0] != undefined) { // If found a link
+                  ctx.lineWidth = 3.5;
                   shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence*/
                   ctx.beginPath();
                   for (j = 0; j < 4; j++) {
@@ -1575,11 +1576,16 @@ else{
                      shapeYCoords.push(coords[1]);
                   }
                   ctx.lineTo(originalCoords[0], originalCoords[1]);
-                  ctx.strokeStyle = "red";
+                  ctx.strokeStyle = "white";
+                  ctx.shadowBlur = 4;
+                  ctx.shadowOffsetX = 3;
+                  ctx.shadowOffsetY = 5;
+                  ctx.shadowColor = "black";
                   ctx.stroke();
                   shapeCoords.push(shapeXCoords);
                   shapeCoords.push(shapeYCoords);
                   shapes.push(shapeCoords);
+                  ctx.closePath();
                }
             }
             document.getElementById("snapshotButton").style.opacity= "1";

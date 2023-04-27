@@ -1576,7 +1576,7 @@ else{
                      shapeYCoords.push(coords[1]);
                   }
                   ctx.lineTo(originalCoords[0], originalCoords[1]);
-                  ctx.strokeStyle = "white";
+                  ctx.strokeStyle = "blue";
                   ctx.shadowBlur = 5;
                   ctx.shadowOffsetX = 8;
                   ctx.shadowOffsetY = 9;

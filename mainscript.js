@@ -1576,10 +1576,9 @@ else{
                      shapeYCoords.push(coords[1]);
                   }
                   ctx.lineTo(originalCoords[0], originalCoords[1]);
-                  ctx.strokeStyle = "blue";
-                  ctx.fill();
-                  ctx.fillStyle = "blue";
-                  ctx.globalAlpha = 0.3;
+                  ctx.strokeStyle = "#6434eb";
+                  ctx.shadowColor = "black";
+                  ctx.stroke();
                   shapeCoords.push(shapeXCoords);
                   shapeCoords.push(shapeYCoords);
                   shapes.push(shapeCoords);

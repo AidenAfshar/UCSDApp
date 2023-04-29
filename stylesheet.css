@@ -75,8 +75,8 @@ video {
 }
 
 .fadeClass {
-    -webkit-animation: fadeinout 2s ease-in forwards;
-    animation: fadeinout 4s ease-in forwards;
+    -webkit-animation: fadeinout 3s ease-in forwards;
+    animation: fadeinout 3s ease-out forwards;
     opacity: 0;
 }
 

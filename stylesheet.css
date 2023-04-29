@@ -95,10 +95,10 @@ video {
     opacity: 1;
     background-image: linear-gradient(
     30deg,
-    #ffffff 0%,
-    #ffffff 29%,
-    #000000 67%,
-    #000000 100%
+    #000000 0%,
+    #000000 29%,
+    #ffffff 67%,
+    #ffffff 100%
     );
     background-size: auto auto;
     background-clip: border-box;

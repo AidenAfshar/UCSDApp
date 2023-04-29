@@ -1738,7 +1738,7 @@ canvas.addEventListener("click", (event) => {
    for (let i = 0; i<shapes.length; i++) {
       pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0], shapes[i][1]);
       if (pointIn == true) {
-         window.open(shapeLinks[i], '_blank');
+         window.open(shapeLinks[i]);
       }
    }
 });

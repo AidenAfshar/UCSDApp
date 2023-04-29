@@ -72,7 +72,7 @@ video {
     pointer-events: none;
     opacity: 1;
     color: rgb(0, 0, 0);
-    font-size: 3.5vw;
+    font-size: 5vw;
     font-family: 'Noto Sans JP', sans-serif;
     -webkit-text-fill-color: transparent;
 }
@@ -121,15 +121,6 @@ video {
     opacity: 0;
 }
 
-@keyframes fadein {
-    50%{
-        opacity: 0;
-    }
-    100%{
-        opacity: 1;
-    }
-}
-
 @keyframes textclip {
     to {
       background-position: 200% center;
@@ -146,7 +137,7 @@ video {
 }
 
 @keyframes fadeinout {
-  85% { opacity: 1; }
+  95% { opacity: 1; }
 }
 
   

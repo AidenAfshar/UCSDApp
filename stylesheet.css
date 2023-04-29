@@ -117,9 +117,9 @@ video {
 }
 
 .fadeAnimClass{
-    -webkit-animation: fadeinout 3s ease-out forwards;
-    animation: fadeinout 2s ease-out forwards;
     opacity: 0;
+    -webkit-animation: fadeinout 3s ease-in forwards;
+    animation: fadeinout 3s ease-out forwards;
 }
 
 @keyframes colorshift {
@@ -140,10 +140,6 @@ video {
     }
   }
 
-@keyframes strokefadein {
-    40%{opacity: 1;  -webkit-text-stroke: 3px; -webkit-text-fill-color: transparent; -webkit-text-stroke-color: rgb(255, 255, 255);}
-    50%{opacity: 1;  -webkit-text-stroke: 3px; -webkit-text-fill-color: transparent; -webkit-text-stroke-color: rgb(0, 0, 0);}
-}
 
 @-webkit-keyframes fadeinout {
   1% { opacity: 1; }
@@ -152,8 +148,3 @@ video {
 @keyframes fadeinout {
   95% { opacity: 1; }
 }
-
-  
-  @keyframes pulsate {
-    50%{ stroke-width:5px }
-  }

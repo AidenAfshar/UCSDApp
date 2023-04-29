@@ -72,7 +72,7 @@ video {
     pointer-events: none;
     opacity: 1;
     color: rgb(0, 0, 0);
-    font-size: 2vw;
+    font-size: 3vw;
     font-family: 'Noto Sans JP', sans-serif;
     -webkit-text-fill-color: transparent;
 }

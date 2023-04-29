@@ -81,9 +81,9 @@ video {
 }
 
 @-webkit-keyframes fadeinout {
-  50% { opacity: 1; }
+  5% { opacity: 1; }
 }
 
 @keyframes fadeinout {
-  50% { opacity: 1; }
+  85% { opacity: 1; }
 }

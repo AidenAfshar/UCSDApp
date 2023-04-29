@@ -70,8 +70,7 @@ video {
 #nothingFoundText{
     opacity: 0;
     font-size: 5vw;
-    color: white;
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    color: #7e42f5;
     font-family: 'Noto Sans JP', sans-serif;
 }
 

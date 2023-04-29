@@ -7,6 +7,9 @@ var canRestart = false;
 var canSnapshot = true;
 var textAndCoords = [];
 var facing = "environment";
+var script = document.createElement('script');
+script.src = 'https://code.jquery.com/jquery-3.2.1.min.js'; // Check https://jquery.com/ for the current version
+document.getElementsByTagName('head')[0].appendChild(script);
 // Accessing the user camera and video.
 
 window.mobileCheck = function() {
@@ -60,7 +63,9 @@ else{
       function init() {
         canvas = document.getElementById("myCanvas");
         ctx = canvas.getContext('2d');
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 10;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#7e42f5";
      }
 
      var canvas = document.getElementById('myCanvas');
@@ -1405,6 +1410,31 @@ else{
    return parsedDict;
    }
 
+   function unfade(element) {
+      var op = 0.1;  // initial opacity
+      element.style.display = 'block';
+      var timer = setInterval(function () {
+          if (op >= 1){
+              clearInterval(timer);
+          }
+          element.style.opacity = op;
+          element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+          op += op * 0.1;
+      }, 10);
+  }
+  function fade(element) {
+      var op = 1;  // initial opacity
+      var timer = setInterval(function () {
+         if (op <= 0.1){
+            clearInterval(timer);
+            element.style.display = 'none';
+         }
+         element.style.opacity = op;
+         element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+         op -= op * 0.1;
+      }, 50);
+   }
+  
    
    var fullDatabase = parse_tsv();
 
@@ -1432,7 +1462,12 @@ else{
             //console.log(e.responseText);
             response = JSON.parse(e.responseText);
             if (response["responses"][0]["fullTextAnnotation"] == undefined) {
-               document.getElementById("restartButton").style.opacity = "0.3";
+               document.getElementById("nothingFoundText").className += ' fadeClass';
+               //Resets it so the animation can be run again when another capture is taken
+               document.getElementById("nothingFoundText").addEventListener('animationend', function() {
+                  document.getElementById("nothingFoundText").className -= ' fadeClass';
+               })
+               document.getElementById("nothingFoundText");
                document.getElementById("cameraButton").style.opacity = "1";
                document.getElementById("snapshotButton").style.opacity= "1";
                document.getElementById("loadingRing").style.opacity = "0";
@@ -1547,7 +1582,6 @@ else{
 
                const result = fuse.search("'" + textAndCoords[i][0]);
                if (result[0] != undefined) { // If found a link
-                  ctx.lineWidth = 12;
                   shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence*/
                   ctx.beginPath();
                   for (j = 0; j < 4; j++) {
@@ -1576,15 +1610,10 @@ else{
                      shapeYCoords.push(coords[1]);
                   }
                   ctx.lineTo(originalCoords[0], originalCoords[1]);
-                  ctx.strokeStyle = "white"
-                  ctx.stroke();
-                  ctx.strokeStyle = "#6434eb"; // Makes outline
-                  ctx.lineWidth = 4;
                   ctx.stroke();
                   shapeCoords.push(shapeXCoords);
                   shapeCoords.push(shapeYCoords);
                   shapes.push(shapeCoords);
-                  ctx.closePath();
                }
             }
             document.getElementById("snapshotButton").style.opacity= "1";

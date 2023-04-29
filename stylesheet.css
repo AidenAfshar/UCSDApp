@@ -4,7 +4,6 @@ body {
 #ucsdLogo {
     margin-bottom: -5vw;
 }
-
 #d0 {
     position: absolute;
     display:flex;
@@ -57,4 +56,35 @@ video {
     font-family: 'Noto Sans JP', sans-serif;
     font-size: 4vw;
     margin: 2vw;
+}
+#d3{
+    position: absolute;
+    margin-top: 20vw;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+#nothingFoundText{
+    opacity: 0;
+    font-size: 3.5vw;
+    color: white;
+    text-shadow: 3px 4px #000000;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+.fadeClass {
+    -webkit-animation: fadeinout 4s linear forwards;
+    animation: fadeinout 1s linear forwards;
+    opacity: 0;
+}
+
+@-webkit-keyframes fadeinout {
+  50% { opacity: 1; }
+}
+
+@keyframes fadeinout {
+  50% { opacity: 1; }
 }

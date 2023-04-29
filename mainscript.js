@@ -1462,12 +1462,13 @@ else{
             //console.log(e.responseText);
             response = JSON.parse(e.responseText);
             if (response["responses"][0]["fullTextAnnotation"] == undefined) {
-               document.getElementById("nothingFoundText").className += ' fadeClass';
+               document.getElementById("nothingFoundText").className += " fadeClass";
+               document.getElementById("d3").className += ' fadeAnimClass';
                //Resets it so the animation can be run again when another capture is taken
-               document.getElementById("nothingFoundText").addEventListener('animationend', function() {
+               document.getElementById("d3").addEventListener('animationend', function() {
                   document.getElementById("nothingFoundText").className -= ' fadeClass';
+                  document.getElementById("d3").className -= " fadeAnimClass";
                })
-               document.getElementById("nothingFoundText");
                document.getElementById("cameraButton").style.opacity = "1";
                document.getElementById("snapshotButton").style.opacity= "1";
                document.getElementById("loadingRing").style.opacity = "0";
@@ -1616,8 +1617,37 @@ else{
                   shapes.push(shapeCoords);
                }
             }
-            document.getElementById("snapshotButton").style.opacity= "1";
-            document.getElementById("loadingRing").style.opacity = "0";
+            console.log(shapeLinks);
+            if (shapeLinks.length == 0) {
+               document.getElementById("nothingFoundText").className += " fadeClass";
+               document.getElementById("d3").className += ' fadeAnimClass';
+               //Resets it so the animation can be run again when another capture is taken
+               document.getElementById("d3").addEventListener('animationend', function() {
+                  document.getElementById("nothingFoundText").className -= ' fadeClass';
+                  document.getElementById("d3").className -= " fadeAnimClass"
+               })
+               document.getElementById("cameraButton").style.opacity = "1";
+               document.getElementById("snapshotButton").style.opacity= "1";
+               document.getElementById("loadingRing").style.opacity = "0";
+               canRestart = false;
+               canSnapshot = true;
+               shapes = []; // Resetting Links;
+               video.play();
+               return;
+            }
+            else {
+               document.getElementById("nothingFoundText").className += " fadeClass";
+               document.getElementById("nothingFoundText").innerHTML = "Click on a box for the full text!";
+               document.getElementById("d3").className += ' fadeAnimClass';
+               //Resets it so the animation can be run again when another capture is taken
+               document.getElementById("d3").addEventListener('animationend', function() {
+                  document.getElementById("nothingFoundText").className -= ' fadeClass';
+                  document.getElementById("d3").className -= " fadeAnimClass";
+                  document.getElementById("nothingFoundText").innerHTML = "No text found";
+               })
+               document.getElementById("snapshotButton").style.opacity= "1";
+               document.getElementById("loadingRing").style.opacity = "0";
+            }
          }
          e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
          e.send(b);

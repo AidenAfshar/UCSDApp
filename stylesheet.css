@@ -58,6 +58,7 @@ video {
     margin: 2vw;
 }
 #d3{
+    pointer-events: none;
     position: absolute;
     margin-top: 20vw;
     margin-left: auto;
@@ -68,16 +69,76 @@ video {
 }
 
 #nothingFoundText{
-    opacity: 0;
-    font-size: 5vw;
-    color: #a57ef3;
+    pointer-events: none;
+    opacity: 1;
+    color: rgb(0, 0, 0);
+    font-size: 2vw;
     font-family: 'Noto Sans JP', sans-serif;
+    -webkit-text-fill-color: transparent;
 }
 
 .fadeClass {
-    -webkit-animation: fadeinout 4s ease-in forwards;
+    /*-webkit-animation: fadeinout 4s ease-in forwards;
     animation: fadeinout 1s ease-out forwards;
+    opacity: 0;*/
+    /*
+    opacity: 1;
+    fill            : none;
+    stroke          : black;
+    stroke-width    : .5px;
+    stroke-linejoin : round;
+    animation       : 2s pulsate infinite;
+    */
+    /*-webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 2px;
+    */
+    opacity: 1;
+    background-image: linear-gradient(
+    30deg,
+    #ffffff 0%,
+    #ffffff 29%,
+    #000000 67%,
+    #000000 100%
+    );
+    background-size: auto auto;
+    background-clip: border-box;
+    background-size: 200% auto;
+    color: #ffffff;
+    background-clip: text;
+    text-fill-color: transparent;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation-direction: alternate-reverse;
+    animation: textclip 2s linear infinite;
+    display: inline-block;
+        font-size: 190px;
+
+}
+
+.fadeAnimClass{
+    -webkit-animation: fadeinout 4s ease-in forwards;
+    animation: fadeinout 3s ease-out forwards;
     opacity: 0;
+}
+
+@keyframes fadein {
+    50%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+
+@keyframes textclip {
+    to {
+      background-position: 200% center;
+    }
+  }
+
+@keyframes strokefadein {
+    40%{opacity: 1;  -webkit-text-stroke: 3px; -webkit-text-fill-color: transparent; -webkit-text-stroke-color: rgb(255, 255, 255);}
+    50%{opacity: 1;  -webkit-text-stroke: 3px; -webkit-text-fill-color: transparent; -webkit-text-stroke-color: rgb(0, 0, 0);}
 }
 
 @-webkit-keyframes fadeinout {
@@ -87,3 +148,8 @@ video {
 @keyframes fadeinout {
   85% { opacity: 1; }
 }
+
+  
+  @keyframes pulsate {
+    50%{ stroke-width:5px }
+  }

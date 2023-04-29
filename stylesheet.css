@@ -72,7 +72,7 @@ video {
     pointer-events: none;
     opacity: 1;
     color: rgb(0, 0, 0);
-    font-size: 5vw;
+    font-size: 6vw;
     font-family: 'Noto Sans JP', sans-serif;
     -webkit-text-fill-color: transparent;
 }
@@ -117,7 +117,7 @@ video {
 
 .fadeAnimClass{
     -webkit-animation: fadeinout 4s ease-in forwards;
-    animation: fadeinout 3s ease-out forwards;
+    animation: fadeinout 4s ease-out forwards;
     opacity: 0;
 }
 

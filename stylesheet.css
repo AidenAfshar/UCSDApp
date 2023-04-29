@@ -72,7 +72,7 @@ video {
     pointer-events: none;
     opacity: 1;
     color: rgb(0, 0, 0);
-    font-size: 5.5vw;
+    font-size: 8vw;
     font-family: 'Noto Sans JP', sans-serif;
     -webkit-text-fill-color: transparent;
 }
@@ -109,7 +109,7 @@ video {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation-direction: alternate-reverse;
-    animation: textclip 2s linear infinite;
+    animation: textclip 4s linear infinite;
     display: inline-block;
         font-size: 190px;
 

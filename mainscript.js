@@ -1637,7 +1637,7 @@ else{
             }
             else {
                document.getElementById("nothingFoundText").className += " fadeClass";
-               document.getElementById("nothingFoundText").innerHTML = "Click on a box for the full text!";
+               document.getElementById("nothingFoundText").innerHTML = "Click on a box\nfor the full text!";
                document.getElementById("d3").className += ' fadeAnimClass';
                //Resets it so the animation can be run again when another capture is taken
                document.getElementById("d3").addEventListener('animationend', function() {

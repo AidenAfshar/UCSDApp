@@ -1,92 +1,97 @@
+// Scanning variables
 var shapes = [];
 var shapeLinks = [];
-var video = document.getElementById('video');
-var mediaDevices = navigator.mediaDevices;
-video.muted = true;
+var textAndCoords = [];
+
+// Camera variables
 var canRestart = false;
 var canSnapshot = true;
-var textAndCoords = [];
 var facing = "environment";
+var canvas, ctx, video;
+var mediaDevices;
+
+// Init canvas vars
+canvas = document.getElementById("myCanvas");
+ctx = canvas.getContext('2d');
+ctx.lineWidth = 10;
+ctx.lineCap = "round";
+ctx.strokeStyle = "#7e42f5";
+
+
+// Set up script
 var script = document.createElement('script');
-script.src = 'https://code.jquery.com/jquery-3.2.1.min.js'; // Check https://jquery.com/ for the current version
 document.getElementsByTagName('head')[0].appendChild(script);
-// Accessing the user camera and video.
 
 window.mobileCheck = function() {
+   // Checks if user is on Mobile or Desktop (necessary because most computers only have one camera, and the app breaks when opening on computer 
+   // if the camera is set to environment, which is what the default should be on mobile)
    let check = false;
    (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
    return check
- };
+};
 
-if (window.mobileCheck() == true){
-   mediaDevices.getUserMedia(
-      {
-         video: { facingMode: { exact: "environment" } },
-         audio: false
-      }
-   )
-   .then((stream) => {
+function setupCamera() {
+   // Initialize variables and turn on feed
+   video = document.getElementById('video');
+   mediaDevices = navigator.mediaDevices;
 
-   // Changing the source of video to current stream.
-   video.srcObject = stream;
-   video.addEventListener("loadedmetadata", () => {
-         video.play();
-   });
-   })
-   .catch(alert);
+   if (window.mobileCheck() == true){
+      mediaDevices.getUserMedia(
+         {
+            // Uses back camera
+            video: { facingMode: { exact: "environment" } },
+            audio: false
+         }
+      )
+      .then((stream) => {
+
+      // Changing the source of video to current stream.
+      video.srcObject = stream;
+      video.addEventListener("loadedmetadata", () => {
+            video.play();
+      });
+      })
+      .catch(alert);
+   }
+   else{
+      /*
+      // Temporary replacement for error page (will be added on real website)
+      document.body.style.fontSize = "3vw";
+      document.body.innerHTML = "Sorry! This website is only available on mobile";
+      */
+      mediaDevices.getUserMedia(
+         {
+            video: true, // Use this for computer and below for phone to prevent camera error
+            //video: { facingMode: { exact: "environment" } },
+            audio: false
+         }
+      )
+      .then((stream) => {
+
+      // Changing the source of video to current stream.
+      video.srcObject = stream;
+      video.addEventListener("loadedmetadata", () => {
+            video.play();
+      });
+      })
+      .catch(alert);
+   }
 }
-else{
-   /*
-   document.body.style.fontSize = "3vw";
-   document.body.innerHTML = "Sorry! This website is only available on mobile";
-   */
-   mediaDevices.getUserMedia(
-      {
-         video: true, // Use this for computer and below for phone
-         //video: { facingMode: { exact: "environment" } },
-         audio: false
-      }
-   )
-   .then((stream) => {
 
-   // Changing the source of video to current stream.
-   video.srcObject = stream;
-   video.addEventListener("loadedmetadata", () => {
-         video.play();
-   });
-   })
-   .catch(alert);
-}
+setupCamera();
 
-      var canvas, ctx;
+video.addEventListener('play', function () {
+   // Displays video in canvas element instead of video element because the canvas is more malleable
+   var $this = this; //cache
+   (function loop() {
+         if (!$this.paused && !$this.ended) {
+            ctx.drawImage($this, 0, 0, canvas.width, canvas.height);
+            setTimeout(loop, 1000 / 60); // drawing at 60fps
+         }
+   })();
+}, 0);
 
-      function init() {
-        canvas = document.getElementById("myCanvas");
-        ctx = canvas.getContext('2d');
-        ctx.lineWidth = 10;
-        ctx.lineCap = "round";
-        ctx.strokeStyle = "#7e42f5";
-     }
-
-     var canvas = document.getElementById('myCanvas');
-     var ctx    = canvas.getContext('2d');
-     var video  = document.getElementById('video');
-
-
-     // Displays video in canvas element instead of video element for ease of manipulation
-     
-     video.addEventListener('play', function () {
-         var $this = this; //cache
-         (function loop() {
-             if (!$this.paused && !$this.ended) {
-                 ctx.drawImage($this, 0, 0, canvas.width, canvas.height);
-                 setTimeout(loop, 1000 / 60); // drawing at 60fps
-             }
-         })();
-     }, 0);
-
-   function parse_tsv() {
-
+function parse_tsv() {
       s =`1	STEP	UNDERSTOOD IS A STEP TOWARD BEING HEALED UNDERSTANDING IS A STEP TOWARD BUILDING COMMUNITY I AM TRYING TO FACILITATE INWARD EXPERIENCE BECAUSE PEOPLE	Oliveros, Pauline	“I began to understand that many people felt that they were not being heard (something especially true today, both locally and globally). I recognized that being heard is a step toward being understood. Being understood is a step toward being healed. Understanding is a step toward building community.”	Oliveros, Pauline. "My "American Music": Soundscape, Politics, Technology, Community." American Music 25, no. 4 (Winter, 2007): 393. doi:10.2307/40071676.	https://www.jstor.org/stable/40071676?seq=1  https://www.press.uillinois.edu/journals/am.html  	https://search-library.ucsd.edu/permalink/01UCS_SDI/1vtf07t/cdi_proquest_journals_1374683	https://kahnop.ucsd.edu/bibliography/spine-index/step_000.html
       2	STEP	ON THE BASIS OF POINTS THAT BECOME CENTRES OF PROFIT AND CALCULATION IN FOLLOWING IT STEP BY STEP ONE NEVER CROSSES THE MYSTERIOUS LIMES THAT	Latour, Bruno	“It is a skein of somewhat longer networks that rather inadequately embrace a world on the basis of points that become centres of profit and calculation. In following it step by step, one never crosses the mysterious limes that should divide the local from the global.” 	Latour, Bruno. We Have Never Been Modern, trans. Catherine Porter. Cambridge: Harvester Wheatsheaf, 1993. p. 121. 	https://www.hup.harvard.edu/catalog.php?isbn=9780674948396  	https://search-library.ucsd.edu/permalink/01UCS_SDI/1vtf07t/cdi_jndl_porta_oai_iss_ndl_go_jp_R100000002_I000003228098_00	https://kahnop.ucsd.edu/bibliography/spine-index/step_000.html
       3	STEP	FACTOR TO WHICH IT IS LINKED BY A SEQUENCE OF INTERVENING STEPS EACH STEP FALLING UNDER A CAUSAL LAW WITHOUT THERE BEING ANY CAUSAL LAW THAT LINKS	Cartwright, Nancy	“Hence a phenomenon may be explained by a factor to which it is linked by a sequence of intervening steps, each step falling under a casual law, without there being any casual law that links the explanans itself with the phenomenon to be explained.” 	Cartwright, Nancy. How the Laws of Physics Lie. Oxford: Clarendon Press, 2010. 	https://global.oup.com/academic/product/how-the-laws-of-physics-lie-9780198247043?cc=us&lang=en&   	https://search-library.ucsd.edu/permalink/01UCS_SDI/ld412s/alma991011768769706535	https://kahnop.ucsd.edu/bibliography/spine-index/step_000.html
@@ -1393,7 +1398,6 @@ else{
       1304	NIGHTS	FROST-STARS LIKE THE SKY THE SUBLIME DARKNESS OF STORM NIGHTS WHEN ALL THE LIGHTS ARE OUT THE CLOUDS IN WHOSE	Muir, John	“...while the meadows at their feet sparkle with frost-stars like the sky; the sublime darkness of storm-nights, when all the lights are out; the clouds whose depths the frail snow-flowers grow; the behavior and many voices of the different kind of storms, trees, birds, waterfalls, and snow avalanches in the ever-changing weather.” 	Muir, John. The Writings of John Muir: Sierra Edition. Vol. II. The Mountains of California. Boston and New York: Houghton Mifflin Company, 1917, 169. 	https://archive.org/details/writingsjohnmuir04muirrich/page/n9/mode/2up	https://search-library.ucsd.edu/permalink/01UCS_SDI/1vtf07t/cdi_gale_digitalcollections_CXSOOT269339742	https://kahnop.ucsd.edu/bibliography/spine-index/nights_097.html
       1305	NIGHTS	SUMMER'S TROPICAL SUN THE BLUE SKY THE APPROACHING NIGHTS AND THE MORNINGS THE SUN THE STARS THE GRASS	Ritter, William Emerson	“The bit of earth upon which I press my feet here and now and the larger earth that yields me food and drink , this ocean with its relentless power when goaded by winter storms, and with its heavenly peace and calm in its middle stretches under the summer's tropical sun, the blue sky, the approaching night , and the night and the morning, the sun, the stars, the milky way, the grass, the trees, my animal companions, the wild birds, the barn-yard fowls, my dogs, the cattle, the horse, and above all my human friends , my colleagues in work, and my family -- all these have for me a reality that no disorder or dimness of mind (unless indeed , these go to the point of swoon or delirium) or no speculative sophistication can strip them of.”	Ritter, William Emerson. The Probable Infinity of Nature and Life; Three Essays. Boston: R.G. Badger, 1918. p. 131. 	 https://babel.hathitrust.org/cgi/pt?id=uc1.31822008697948&view=1up&seq=7 	https://search-library.ucsd.edu/permalink/01UCS_SDI/1vtf07t/cdi_istex_primary_ark_67375_6GQ_PFF9WZTF_Q	https://kahnop.ucsd.edu/bibliography/spine-index/nights_097.html`
       
-
    var parsedDict = {};
    var ix_end = 0;
    for (var ix=0; ix<s.length; ix=ix_end+1) {
@@ -1408,149 +1412,127 @@ else{
       }
    }
    return parsedDict;
-   }
+}    
 
-   function unfade(element) {
-      var op = 0.1;  // initial opacity
-      element.style.display = 'block';
-      var timer = setInterval(function () {
-          if (op >= 1){
-              clearInterval(timer);
-          }
-          element.style.opacity = op;
-          element.style.filter = 'alpha(opacity=' + op * 100 + ")";
-          op += op * 0.1;
-      }, 10);
-  }
-  function fade(element) {
-      var op = 1;  // initial opacity
-      var timer = setInterval(function () {
-         if (op <= 0.1){
-            clearInterval(timer);
-            element.style.display = 'none';
+var fullDatabase = parse_tsv();
+
+// Set up search
+const options = {
+
+   includeScore: true, // Rating allows for options to be shown from lowest to highest score
+   tokenize: false, // Debug measure (tokenize causes each word to be separate)
+   ignoreLocation: true, // Debug measure (we don't care about where in the database the text is, so location doesn't matter)
+   threshold: 0.3 // High threshold = good results
+}
+const fuse = new Fuse(Object.keys(fullDatabase), options);
+
+document.getElementById("snapshotButton").addEventListener("click", () => {
+   if (canSnapshot == true) {
+      // Show loading anim
+      document.getElementById("snapshotButton").style.opacity= "0";
+      document.getElementById("loadingRing").style.opacity = "1";
+      
+      textAndCoords = [];
+      canSnapshot = false; // Not allowing snapshots while loading
+      video.pause();
+
+      var basePicture = canvas.toDataURL('image/png', 1.0); // Base64 representation of canvas image
+      filename = basePicture.slice(22); // Removes "data:image..." prefix from the dataUrl for compatibility with google
+
+      // Post Request
+      var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"TEXT_DETECTION","maxResults":5}]    } ]});
+      var e=new XMLHttpRequest;
+      e.onload=function(){
+         document.getElementById("restartButton").style.opacity = "1"; // Loading UI
+         document.getElementById("cameraButton").style.opacity = "0.3"; 
+         canRestart = true; // Allowing User to restart feed after snapshot loaded (this can be at the top of this function because all of the changes appear on screen at once)
+         response = JSON.parse(e.responseText);
+         if (response["responses"][0]["fullTextAnnotation"] == undefined) {
+            // If no text is found, exit function and reset page
+            document.getElementById("nothingFoundText").className += " fadeClass"; // Show error message
+            document.getElementById("d3").className += ' fadeAnimClass';
+            //Resets it so the animation can be run again when another capture is taken
+            document.getElementById("d3").addEventListener('animationend', function() {
+               document.getElementById("nothingFoundText").className -= ' fadeClass';
+               document.getElementById("d3").className -= " fadeAnimClass";
+            })
+            // Reset UI
+            document.getElementById("cameraButton").style.opacity = "1";
+            document.getElementById("snapshotButton").style.opacity= "1";
+            document.getElementById("loadingRing").style.opacity = "0";
+            canRestart = false;
+            canSnapshot = true;
+            video.play();
+            return;
          }
-         element.style.opacity = op;
-         element.style.filter = 'alpha(opacity=' + op * 100 + ")";
-         op -= op * 0.1;
-      }, 50);
-   }
-  
-   
-   var fullDatabase = parse_tsv();
-
-   document.getElementById("snapshotButton").addEventListener("click", () => {
-      if (canSnapshot == true) {
-         document.getElementById("snapshotButton").style.opacity= "0";
-         document.getElementById("loadingRing").style.opacity = "1";
-         textAndCoords = [];
-         canSnapshot = false;
-         canvas = document.getElementById("myCanvas"); // Repeated line for use below
-         video = document.querySelector('video');
-         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // Creates duplicate of canvas contents
-         var text = canvas.toDataURL('image/png', 1.0); // A text representation of the canvas's image in png format
-         video.pause();
-
-         filename = text.slice(22); // Removes "data:image..." prefix from the dataUrl
-
-         // Post Request
-         var b=JSON.stringify({"requests":[{  "image":{    "content":filename    }  ,  "features": [{"type":"TEXT_DETECTION","maxResults":5}]    } ]});
-         var e=new XMLHttpRequest;
-         e.onload=function(){
-            document.getElementById("restartButton").style.opacity = "1";
-            document.getElementById("cameraButton").style.opacity = "0.3";
-            canRestart = true;
-            //console.log(e.responseText);
-            response = JSON.parse(e.responseText);
-            if (response["responses"][0]["fullTextAnnotation"] == undefined) {
-               document.getElementById("nothingFoundText").className += " fadeClass";
-               document.getElementById("d3").className += ' fadeAnimClass';
-               //Resets it so the animation can be run again when another capture is taken
-               document.getElementById("d3").addEventListener('animationend', function() {
-                  document.getElementById("nothingFoundText").className -= ' fadeClass';
-                  document.getElementById("d3").className -= " fadeAnimClass";
-               })
-               document.getElementById("cameraButton").style.opacity = "1";
-               document.getElementById("snapshotButton").style.opacity= "1";
-               document.getElementById("loadingRing").style.opacity = "0";
-               canRestart = false;
-               canSnapshot = true;
-               video.play();
-               return;
-            }
-            var vertices = [];
-            var line;
-            var coordX1;
-            var coordX2;
-            var coordY1;
-            var coordY2;
-            pages = response["responses"][0]["fullTextAnnotation"]["pages"];
-            for (let i = 0; i < pages.length; i++) {
-               
-               blocks = pages[i]["blocks"];
-               for (let j = 0; j < blocks.length; j++){
-
-                  paragraphs = blocks[j]["paragraphs"];
-                  for (let l = 0; l < pages[i]["blocks"][j]["paragraphs"].length; l++) {
-
-                     line = "";
-                     words =  paragraphs[l]["words"];
-                     for (let k = 0; k < words.length; k++) {
-                        symbols = pages[i]["blocks"][j]["paragraphs"][l]["words"][k]["symbols"];
-                        if (line == "") {
-                           coordX1 = symbols[0]["boundingBox"]["vertices"][0]["x"];
-                           if (coordX1 == undefined) {
-                              coordX1 = 0;
-                           }
-                           coordX2 = symbols[0]["boundingBox"]["vertices"][3]["x"];
-                           if (coordX2 == undefined) {
-                              coordX2 = 0;
-                           }
-                           coordY1 = symbols[0]["boundingBox"]["vertices"][0]["y"];
-                           if (coordY1 == undefined) {
-                              coordY1 = 0;
-                           }
-                           coordY2 = symbols[0]["boundingBox"]["vertices"][3]["y"];
-                           if (coordY2 == undefined) {
-                              coordY2 = 0;
-                           }
-                           vertices.push([coordX1, coordY1]); // Top left coord 
-                           vertices.push([coordX2, coordY2]); // Bottom left coord
+         var vertices = [];
+         var line;
+         var coordX1;
+         var coordX2;
+         var coordY1;
+         var coordY2;
+         // Loop through each character Google finds
+         pages = response["responses"][0]["fullTextAnnotation"]["pages"];
+         for (let i = 0; i < pages.length; i++) {
+            blocks = pages[i]["blocks"];
+            for (let j = 0; j < blocks.length; j++){
+               paragraphs = blocks[j]["paragraphs"];
+               for (let l = 0; l < pages[i]["blocks"][j]["paragraphs"].length; l++) {
+                  // Reset line
+                  line = "";
+                  words =  paragraphs[l]["words"];
+                  for (let k = 0; k < words.length; k++) {
+                     symbols = pages[i]["blocks"][j]["paragraphs"][l]["words"][k]["symbols"];
+                     if (line == "") {
+                        // Storing coordinates of first character
+                        coordX1 = symbols[0]["boundingBox"]["vertices"][0]["x"];
+                        if (coordX1 == undefined) {
+                           coordX1 = 0;
                         }
-                        for (let p = 0; p < symbols.length; p++) {
-
-                           line += symbols[p]["text"];
-                           if (["property"] in symbols[p]){
-                              if (["detectedBreak"] in symbols[p]["property"]) {
-                                 if (symbols[p]["property"]["detectedBreak"]["type"] == "SPACE") {
-                                    line += ' ';
+                        coordX2 = symbols[0]["boundingBox"]["vertices"][3]["x"];
+                        if (coordX2 == undefined) {
+                           coordX2 = 0;
+                        }
+                        coordY1 = symbols[0]["boundingBox"]["vertices"][0]["y"];
+                        if (coordY1 == undefined) {
+                           coordY1 = 0;
+                        }
+                        coordY2 = symbols[0]["boundingBox"]["vertices"][3]["y"];
+                        if (coordY2 == undefined) {
+                           coordY2 = 0;
+                        }
+                        vertices.push([coordX1, coordY1]); // Top left coord 
+                        vertices.push([coordX2, coordY2]); // Bottom left coord
+                     }
+                     for (let p = 0; p < symbols.length; p++) {
+                        line += symbols[p]["text"];
+                        if (["property"] in symbols[p]){
+                           if (["detectedBreak"] in symbols[p]["property"]) {
+                              if (symbols[p]["property"]["detectedBreak"]["type"] == "SPACE") {
+                                 line += ' ';
+                              }
+                              // If line ends, store coordinates of last character
+                              if (symbols[p]["property"]["detectedBreak"]["type"] == "LINE_BREAK" || symbols[p]["property"]["detectedBreak"]["type"] == "EOL_SURE_SPACE") {
+                                 coordX1 = symbols[p]["boundingBox"]["vertices"][1]["x"];
+                                 if (coordX1 < 0) {
+                                    coordX1 = 0;
                                  }
-                                 // If line ends
-                                 if (symbols[p]["property"]["detectedBreak"]["type"] == "LINE_BREAK" || symbols[p]["property"]["detectedBreak"]["type"] == "EOL_SURE_SPACE") {
-
-                                    coordX1 = symbols[p]["boundingBox"]["vertices"][1]["x"];
-                                    if (coordX1 < 0) {
-                                       coordX1 = 0;
-                                    }
-                                    coordX2 = symbols[p]["boundingBox"]["vertices"][2]["x"];
-                                    if (coordX2 < 0) {
-                                       coordX2 = 0;
-                                    }
-                                    coordY1 = symbols[p]["boundingBox"]["vertices"][1]["y"];
-                                    if (coordY1 < 0) {
-                                       coordY1 = 0;
-                                    }
-                                    coordY2 = symbols[p]["boundingBox"]["vertices"][2]["y"];
-                                    if (coordY2 < 0) {
-                                       coordY2 = 0;
-                                    }
-
-                                    vertices.push([coordX1, coordY1]); // Top right coord 
-                                    vertices.push([coordX2, coordY2]); // Bottom right coord 
-
-                                    textAndCoords.push([line, vertices]);
-                                    line = "";
-                                    vertices = [];
+                                 coordX2 = symbols[p]["boundingBox"]["vertices"][2]["x"];
+                                 if (coordX2 < 0) {
+                                    coordX2 = 0;
                                  }
+                                 coordY1 = symbols[p]["boundingBox"]["vertices"][1]["y"];
+                                 if (coordY1 < 0) {
+                                    coordY1 = 0;
+                                 }
+                                 coordY2 = symbols[p]["boundingBox"]["vertices"][2]["y"];
+                                 if (coordY2 < 0) {
+                                    coordY2 = 0;
+                                 }
+                                 vertices.push([coordX1, coordY1]); // Top right coord 
+                                 vertices.push([coordX2, coordY2]); // Bottom right coord 
+                                 textAndCoords.push([line, vertices]);
+                                 vertices = [];
                               }
                            }
                         }
@@ -1558,104 +1540,98 @@ else{
                   }
                }
             }
+         }
 
-            var coords;
-            var originalCoords;
-            
-            const options = {
+         var coords;
+         var originalCoords;
+         
+         var shapeCoords = []; // Coordinates for each box corresponding to the text
+         var shapeXCoords = [];
+         var shapeYCoords = [];
 
-               includeScore: true, // Rating allows for options to be shown from lowest to highest score
-               tokenize: false, // Debug measure (tokenize causes each word to be separate)
-               ignoreLocation: true, // Debug measure (we don't care about where in the database the text is, so location doesn't matter)
-               threshold: 0.3 // High threshold = good results
-            }
+         for (let i = 0; i < textAndCoords.length; i++) {
+            shapeCoords = [];
+            shapeXCoords = [];
+            shapeYCoords = [];
 
-            var shapeCoords = [];
-            var shapeXCoords = [];
-            var shapeYCoords = [];
-            
-            const fuse = new Fuse(Object.keys(fullDatabase), options);
-
-            for (let i = 0; i < textAndCoords.length; i++) {
-               shapeCoords = [];
-               shapeXCoords = [];
-               shapeYCoords = [];
-
-               const result = fuse.search("'" + textAndCoords[i][0]);
-               if (result[0] != undefined) { // If found a link
-                  shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence*/
-                  ctx.beginPath();
-                  for (j = 0; j < 4; j++) {
-                     coords = textAndCoords[i][1][j];
-                     if (j == 0) {
-                        ctx.moveTo(coords[0], coords[1]);
-                        originalCoords = coords;
-                     }
-                     else if (j == 1) {
-                        coords = textAndCoords[i][1][2];
-                        ctx.lineTo(coords[0], coords[1]);
-                        ctx.moveTo(coords[0], coords[1]);
-                        //ctx.moveTo(coords[0], coords[1]);
-                     }
-                     else if (j == 2) {
-                        coords = textAndCoords[i][1][3];
-                        ctx.lineTo(coords[0], coords[1]);
-                        //ctx.moveTo(coords[0], coords[1]);
-                     }
-                     else {
-                        coords = textAndCoords[i][1][1]
-                        //ctx.moveTo(prevCoords);
-                        ctx.lineTo(coords[0], coords[1]);
-                     }
-                     shapeXCoords.push(coords[0]);
-                     shapeYCoords.push(coords[1]);
+            const result = fuse.search("'" + textAndCoords[i][0]);
+            if (result[0] != undefined) { // If found a link
+               shapeLinks.push(fullDatabase[result[0]["item"]]["link"]); // Gets link corresponding to the sentence
+               ctx.beginPath();
+               for (j = 0; j < 4; j++) {
+                  coords = textAndCoords[i][1][j];
+                  if (j == 0) {
+                     // Top left
+                     ctx.moveTo(coords[0], coords[1]);
+                     originalCoords = coords;
                   }
-                  ctx.lineTo(originalCoords[0], originalCoords[1]);
-                  ctx.stroke();
-                  shapeCoords.push(shapeXCoords);
-                  shapeCoords.push(shapeYCoords);
-                  shapes.push(shapeCoords);
+                  else if (j == 1) {
+                     // Top right
+                     coords = textAndCoords[i][1][2];
+                     ctx.lineTo(coords[0], coords[1]);
+                     ctx.moveTo(coords[0], coords[1]);
+                  }
+                  else if (j == 2) {
+                     // Bottom right 
+                     coords = textAndCoords[i][1][3];
+                     ctx.lineTo(coords[0], coords[1]);
+                  }
+                  else {
+                     // Bottom left
+                     coords = textAndCoords[i][1][1]
+                     ctx.lineTo(coords[0], coords[1]);
+                  }
+                  shapeXCoords.push(coords[0]);
+                  shapeYCoords.push(coords[1]);
                }
-            }
-            console.log(shapeLinks);
-            if (shapeLinks.length == 0) {
-               document.getElementById("nothingFoundText").className += " fadeClass";
-               document.getElementById("d3").className += ' fadeAnimClass';
-               //Resets it so the animation can be run again when another capture is taken
-               document.getElementById("d3").addEventListener('animationend', function() {
-                  document.getElementById("nothingFoundText").className -= ' fadeClass';
-                  document.getElementById("d3").className -= " fadeAnimClass"
-               })
-               document.getElementById("cameraButton").style.opacity = "1";
-               document.getElementById("snapshotButton").style.opacity= "1";
-               document.getElementById("loadingRing").style.opacity = "0";
-               canRestart = false;
-               canSnapshot = true;
-               shapes = []; // Resetting Links;
-               video.play();
-               return;
-            }
-            else {
-               document.getElementById("nothingFoundText").className += " fadeClass";
-               document.getElementById("nothingFoundText").innerHTML = "Click on a box</br>for the full text!";
-               document.getElementById("d3").className += ' fadeAnimClass';
-               //Resets it so the animation can be run again when another capture is taken
-               document.getElementById("d3").addEventListener('animationend', function() {
-                  document.getElementById("nothingFoundText").className -= ' fadeClass';
-                  document.getElementById("d3").className -= " fadeAnimClass";
-                  document.getElementById("nothingFoundText").innerHTML = "No text found";
-               })
-               document.getElementById("snapshotButton").style.opacity= "1";
-               document.getElementById("loadingRing").style.opacity = "0";
+               // Drawing line back to top left 
+               ctx.lineTo(originalCoords[0], originalCoords[1]);
+               ctx.stroke();
+               shapeCoords.push(shapeXCoords);
+               shapeCoords.push(shapeYCoords);
+               shapes.push(shapeCoords);
             }
          }
-         e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
-         e.send(b);
+         if (shapeLinks.length == 0) {
+            // If text is found but no links are found, resets page
+            document.getElementById("nothingFoundText").className += " fadeClass";
+            document.getElementById("d3").className += ' fadeAnimClass';
+            //Resets it so the animation can be run again when another capture is taken
+            document.getElementById("d3").addEventListener('animationend', function() {
+               document.getElementById("nothingFoundText").className -= ' fadeClass';
+               document.getElementById("d3").className -= " fadeAnimClass"
+            })
+            document.getElementById("cameraButton").style.opacity = "1";
+            document.getElementById("snapshotButton").style.opacity= "1";
+            document.getElementById("loadingRing").style.opacity = "0";
+            canRestart = false;
+            canSnapshot = true;
+            shapes = [];
+            video.play();
+            return;
+         }
+         else {
+            // Fading in and out instructions
+            document.getElementById("nothingFoundText").className += " fadeClass";
+            document.getElementById("nothingFoundText").innerHTML = "Click on a box</br>for the full text!";
+            document.getElementById("d3").className += ' fadeAnimClass';
+            //Removes the class so the animation can be run again when taking another photo
+            document.getElementById("d3").addEventListener('animationend', function() {
+               document.getElementById("nothingFoundText").className -= ' fadeClass';
+               document.getElementById("d3").className -= " fadeAnimClass";
+               document.getElementById("nothingFoundText").innerHTML = "No text found";
+            })
+            document.getElementById("snapshotButton").style.opacity= "1";
+            document.getElementById("loadingRing").style.opacity = "0";
+         }
       }
-   });
+      e.open("POST","https://vision.googleapis.com/v1/images:annotate?key=AIzaSyB8h-avSiOPNDfmR0RJxr52LJoM9c5RIyQ",!0); // Not sure why !0 is used here instead of 1, but left it just in case
+      e.send(b);
+   }
+});
 
-function checkcheck (x, y, cornersX, cornersY) {
-
+function checkPointWithinCoords (x, y, cornersX, cornersY) {
+   // Not exactly sure how this works, but checks if a point is in a quadrilaterial with given points
    var i; 
    var j = cornersX.length-1;
    var odd = false;
@@ -1735,11 +1711,13 @@ document.getElementById("cameraButton").addEventListener("click", () => {
 });
 
 canvas.addEventListener("click", (event) => {
+   // When a box is clicked, take the user to the corresponding link
    for (let i = 0; i<shapes.length; i++) {
-      pointIn = checkcheck(event.offsetX, event.offsetY, shapes[i][0], shapes[i][1]);
+      pointIn = checkPointWithinCoords(event.offsetX, event.offsetY, shapes[i][0], shapes[i][1]);
       if (pointIn == true) {
-         window.location.href = shapeLinks[i]; // Same tab
-         //window.open(shapeLinks[i]); New tab
+         //window.location.href = shapeLinks[i]; // Open link in same tab
+         window.open(shapeLinks[i]); // Open link in different tab 
+                                     // (this is done because when you do it same tab and go back to this website after looking at the link the camera breaks)
       }
    }
 });
